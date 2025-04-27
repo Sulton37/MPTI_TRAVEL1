@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacationland</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        header {
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 50px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        nav {
+            display: flex;
+        }
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 90vh;
+            background: url('a0c44a3b-abee-441f-a392-84d5863c2cb6.png') no-repeat center center/cover;
+        }
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 20px;
+            }
+            nav {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Barong_Bali.svg/2048px-Barong_Bali.svg.png" alt="Logo Vacationland">
+        <h1><span style="color: white;">Vacation</span><span style="color: orange;">land</span></h1>
+    </div>
+    <nav>
+        <a href="#">HOME</a>
+        <a href="#">DESTINATION</a>
+        <a href="#">RENT</a>
+        <a href="#">GALLERY</a>
+        <a href="#">PROFILE</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <!-- Gambar latar utama -->
+</section>
+
+</body>
+</html>
