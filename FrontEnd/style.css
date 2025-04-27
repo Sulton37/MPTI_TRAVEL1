@@ -42,7 +42,7 @@ nav a {
     background-position: center;
 }
 
-..tour-section {
+.tour-section {
     padding: 40px 20px;
     background-color: #f5f5f5;
     overflow: hidden; /* Hide overflow */
