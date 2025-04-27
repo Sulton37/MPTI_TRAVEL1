@@ -83,6 +83,24 @@ nav a {
 .tour-card .content {
     padding: 15px;
 }
+.detail-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 20px;
+    background-color: #25D366;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+    text-align: center;
+}
+
+.detail-button:hover {
+    background-color: #1ebe57;
+    transform: translateY(-2px);
+}
 
 .whatsapp-button {
     position: fixed;
