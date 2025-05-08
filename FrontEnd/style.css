@@ -4,12 +4,20 @@ body {
 }
 
 header {
-    background: linear-gradient(to bottom, #3498db, #2980b9);
-    padding: 15px 20px; /* Menambah padding untuk navbar */
+    background: linear-gradient(-45deg, #3498db, #2980b9, #8dc6ff, #01f6c5);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: white;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 header .logo {
@@ -23,32 +31,22 @@ header .logo img {
 }
 
 header .logo span {
-    font-size: 1.7em;
-    font-weight: 600; /* Lebih halus dari bold */
+    font-size: 1.8em;
+    font-weight: 600;
     font-family: 'Lora', serif;
-    color: #2d3436; /* Hitam kebiruan yang elegan */
-    letter-spacing: 0.3px;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-shadow: 0 0 0 transparent; /* Awal tanpa shadow */
 }
 
+/* Efek mengkilap saat hover */
 header .logo span:hover {
-    color: #6c5ce7; /* Warna ungu lembut */
-    transform: translateY(-1px); /* Efek mengambang subtle */
-}
-
-/* Garis bawah minimalis */
-header .logo span::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 1px;
-    background: #6c5ce7;
-    transition: width 0.3s;
-    margin-top: 2px;
-}
-
-header .logo span:hover::after {
-    width: 100%;
+    color: #fff; /* Warna teks berubah putih */
+    text-shadow: 
+        0 0 8px rgba(255, 215, 0, 0.8), /* Kilau emas */
+        0 0 12px rgba(255, 255, 255, 0.6); /* Highlight putih */
+    transform: scale(1.02);
 }
 
 nav a {
@@ -108,7 +106,36 @@ nav a:hover::after {
     overflow-x: auto; /* Enable horizontal scrolling */
     scroll-behavior: smooth; /* Smooth scrolling */
     padding: 10px 0; /* Optional padding */
+    min-width: 100%; /* Ensure it fills the container */
+    flex-wrap: nowrap; /* Prevent wrapping */
 }
+
+.tour-card {
+    background: white;
+    margin: 10px; /* Space between cards */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 0 0 calc(25% - 20px); /* 4 cards per row, adjust for margin */
+    max-width: calc(25% - 20px); /* Ensure max width for 4 cards */
+    transition: box-shadow 0.3s, transform 0.3s;
+    position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tour-card {
+        flex: 0 0 calc(50% - 20px); /* 2 cards per row on smaller screens */
+        max-width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    .tour-card {
+        flex: 0 0 calc(100% - 20px); /* 1 card per row on very small screens */
+        max-width: calc(100% - 20px);
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -121,100 +148,143 @@ nav a:hover::after {
 }
 
 
+
 .tour-card {
     background: white;
-    margin: 10px;
+    margin: 10px; /* Space between cards */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    flex-shrink: 0; /* Prevent shrinking */
-    overflow: hidden; /* Menyembunyikan bagian yang melampaui */
-    transition: box-shadow 0.3s, transform 0.3s; /* Transisi halus */
+    flex: 0 0 calc(25% - 20px); /* 4 cards per row, adjust for margin */
+    max-width: calc(25% - 20px); /* Ensure max width for 4 cards */
+    transition: box-shadow 0.3s, transform 0.3s;
+    position: relative;
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack children vertically */
 }
 
+/* Image Slideshow Container */
+.image-slideshow {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Fixed height for the slideshow */
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+    transform: translateZ(0); /* Optimasi hardware acceleration */
+}
+
+/* Image Styling */
+.image-slideshow img {
+    position: absolute;
+    width: 100%;
+    height: 100%; /* Ensure all images fill the container */
+    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    opacity: 0;
+    transform: scale(1.05);
+    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: brightness(0.95);
+}
+
+/* First image visible by default */
+.image-slideshow img:first-child {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Smooth Slideshow Animation */
+.tour-card:hover .image-slideshow img:nth-child(1) {
+    animation: imageCycle 12s infinite 0s;
+}
+.tour-card:hover .image-slideshow img:nth-child(2) {
+    animation: imageCycle 12s infinite 2s;
+}
+.tour-card:hover .image-slideshow img:nth-child(3) {
+    animation: imageCycle 12s infinite 4s;
+}
+.tour-card:hover .image-slideshow img:nth-child(4) {
+    animation: imageCycle 12s infinite 6s;
+}
+.tour-card:hover .image-slideshow img:nth-child(5) {
+    animation: imageCycle 12s infinite 8s;
+}
+.tour-card:hover .image-slideshow img:nth-child(6) {
+    animation: imageCycle 12s infinite 10s;
+}
+
+/* Enhanced Animation Keyframes */
+@keyframes imageCycle {
+    0% {
+        opacity: 0;
+        transform: scale(1.05);
+        filter: brightness(0.9) contrast(1.1);
+    }
+    8% {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1) contrast(1);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    38% {
+        opacity: 0;
+        transform: scale(1.02);
+        filter: brightness(1.05) contrast(1.05);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+}
+
+/* Card Hover Effects */
 .tour-card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Bayangan lebih dalam */
-    transform: translateY(-5px); /* Mengangkat sedikit */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
 }
 
-.tour-card img {
-    transition: transform 0.3s; /* Transisi halus untuk gambar */
+.tour-card:hover .content {
+    background: linear-gradient(to bottom, transparent, #e4e4e4 20%);
 }
 
-.tour-card:hover img {
-    transform: scale(1.05); /* Memperbesar gambar sedikit saat hover */
+/* Content Transition */
+.content {
+    padding: 20px;
+    transition: all 0.5s ease;
+    background: white;
+    flex-grow: 1; /* Allow content to grow and take available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensure that content takes up available space and button stays at the bottom */
 }
 
-.tour-card .content h3 {
-    transition: color 0.3s; /* Transisi halus untuk judul */
-}
 
+
+/* Text Effects */
 .tour-card:hover .content h3 {
-    color: #ba8814; /* Mengubah warna teks judul saat hover */
-}
-
-.tour-card .content p {
-    transition: color 0.3s; /* Transisi halus untuk deskripsi */
+    color: #d4a017;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .tour-card:hover .content p {
-    color: #555; /* Mengubah warna teks deskripsi saat hover */
+    color: #555;
+    transform: translateY(-2px);
 }
 
-.detail-button {
-    background-color: #25D366;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 8px 15px;
-    transition: background-color 0.3s, transform 0.3s; /* Transisi halus */
+.tour-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
 }
-
-.detail-button:hover {
-    background-color: #1ebe57; /* Mengubah warna latar belakang tombol */
-    transform: scale(1.05); /* Memperbesar tombol sedikit saat hover */
-}
-
-
-.detail-button {
-    background-color: #25D366;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.3s; /* Transisi halus */
-}
-
-.detail-button:hover {
-    background-color: #1ebe57; /* Mengubah warna latar belakang tombol */
-    transform: scale(1.1); /* Memperbesar tombol saat hover */
-}
-
-.tour-card img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-}
-
-@keyframes shrinkImage {
-    0% {
-        height: 600px; /* awalnya besar */
-    }
-    100% {
-        height: 300px; /* lalu mengecil ke normal */
-    }
-}
-
 
 .tour-card .content {
     padding: 15px;
 }
+
+
+
 .detail-button {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: auto; /* Push the button to the bottom */
     padding: 8px 20px;
     background-color: #25D366;
     color: white;
@@ -222,14 +292,34 @@ nav a:hover::after {
     text-decoration: none;
     font-size: 14px;
     font-weight: bold;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s, letter-spacing 0.3s;
     text-align: center;
+    position: relative;
 }
 
 .detail-button:hover {
-    background-color: #1ebe57;
-    transform: translateY(-2px);
+    background-color: #1ebe57; /* Slightly darker green */
+    transform: translateY(-4px) scale(1.05); /* Slight lift and grow effect */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+    letter-spacing: 1px; /* Add space between letters to enhance hover effect */
 }
+
+.detail-button::after {
+    content: '→'; /* Add a right arrow to indicate action */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.detail-button:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(5px); /* Move arrow to the right */
+}
+
 
 .whatsapp-button {
     position: fixed;
