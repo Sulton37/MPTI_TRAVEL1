@@ -1,6 +1,9 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden; /* Pastikan tidak ada scroll horizontal */
 }
 
 header {
@@ -12,6 +15,8 @@ header {
     justify-content: space-between;
     align-items: center;
     color: white;
+    position: relative;
+    z-index: 1; /* Membuat header berada di atas video */
 }
 
 @keyframes gradientBG {
@@ -22,13 +27,68 @@ header {
 
 header .logo {
     display: flex;
-    align-items: center;
+    align-items: center; /* Memastikan logo dan teks berada di tengah */
+}
+
+header .logo {
+    position: relative; /* Ensure positioning for the pseudo-element */
 }
 
 header .logo img {
-    height: 50px;
-    margin-right: 10px;
+    height: 80px; /* Maintain size */
+    margin-bottom: 0;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    transition:
+        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer; /* Indicate interactivity */
+    filter: brightness(1);
+    z-index: 1; /* Ensure logo is above the glow */
 }
+
+/* Spotlight glow effect */
+header .logo img::before {
+    content: "";
+    position: absolute;
+    top: -5px; /* Adjusted for better alignment */
+    left: -5px; /* Adjusted for better alignment */
+    width: calc(100% + 10px); /* Slightly larger than the logo */
+    height: calc(100% + 10px); /* Slightly larger than the logo */
+    border-radius: 12px; /* Rounded corners */
+    pointer-events: none; /* Prevent interaction */
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3); /* Soft initial glow */
+    opacity: 0; /* Start hidden */
+    transition: opacity 0.4s ease; /* Smooth transition */
+    z-index: 0; /* Behind the logo */
+}
+
+/* Hover effect */
+header .logo img:hover {
+    transform: scale(1.05) rotate(-1deg); /* Slight zoom and tilt */
+    box-shadow: 0 6px 24px rgba(52, 152, 219, 0.25); /* Enhanced shadow */
+    filter: brightness(1.1); /* Brighten on hover */
+}
+
+header .logo img:hover::before {
+    opacity: 1; /* Show glow on hover */
+    animation: spotlightGlow 1.5s ease-in-out infinite; /* Pulsating effect */
+    box-shadow: 0 0 25px 10px rgba(52, 152, 219, 0.5); /* Stronger glow */
+}
+
+/* Pulsating glow animation */
+@keyframes spotlightGlow {
+    0%, 100% {
+        box-shadow: 0 0 25px 10px rgba(52, 152, 219, 0.5);
+        opacity: 1; /* Fully visible */
+    }
+    50% {
+        box-shadow: 0 0 35px 15px rgba(52, 152, 219, 0.7); /* Brighter glow */
+        opacity: 0.8; /* Slightly less visible */
+    }
+}
+
 
 header .logo span {
     font-size: 1.8em;
@@ -39,6 +99,7 @@ header .logo span {
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     text-shadow: 0 0 0 transparent; /* Awal tanpa shadow */
 }
+
 
 /* Efek mengkilap saat hover */
 header .logo span:hover {
@@ -87,13 +148,27 @@ nav a:hover::after {
 }
 
 
+/* Pastikan .hero mengisi seluruh layar */
 .hero {
     position: relative;
-    height: 80vh;
-    background-image: url('https://your-hero-image-link.com'); /* Ganti dengan gambar hero Anda */
-    background-size: cover;
-    background-position: center;
+    width: 100vw;  /* Memastikan lebar penuh viewport */
+    height: 100vh; /* Memastikan tinggi penuh viewport */
+    overflow: hidden;  /* Menyembunyikan bagian video yang keluar */
 }
+
+/* Mengatur video agar mengisi layar penuh */
+.hero video {
+    position: fixed;  /* Menggunakan fixed supaya video tetap di belakang konten */
+    top: 0;
+    left: 0;
+    width: 100vw;  /* Mengisi seluruh lebar viewport */
+    height: 100vh; /* Mengisi seluruh tinggi viewport */
+    object-fit: cover; /* Agar video mengisi area tanpa distorsi */
+    z-index: -1; /* Menempatkan video di belakang konten lain */
+}
+
+
+
 
 .tour-section {
     padding: 40px 20px;
