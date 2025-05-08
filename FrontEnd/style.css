@@ -5,7 +5,7 @@ body {
 
 header {
     background: linear-gradient(to bottom, #3498db, #2980b9);
-    padding: 10px 20px;
+    padding: 15px 20px; /* Menambah padding untuk navbar */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -23,16 +23,71 @@ header .logo img {
 }
 
 header .logo span {
-    font-size: 1.5em;
-    font-weight: bold;
+    font-size: 1.7em;
+    font-weight: 600; /* Lebih halus dari bold */
+    font-family: 'Lora', serif;
+    color: #2d3436; /* Hitam kebiruan yang elegan */
+    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+header .logo span:hover {
+    color: #6c5ce7; /* Warna ungu lembut */
+    transform: translateY(-1px); /* Efek mengambang subtle */
+}
+
+/* Garis bawah minimalis */
+header .logo span::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 1px;
+    background: #6c5ce7;
+    transition: width 0.3s;
+    margin-top: 2px;
+}
+
+header .logo span:hover::after {
+    width: 100%;
 }
 
 nav a {
+    font-family: 'Roboto', sans-serif; /* Menggunakan font Roboto untuk navbar */
     color: white;
-    margin: 0 15px;
+    margin: 0 20px; /* Menambah jarak antar link */
     text-decoration: none;
     font-weight: bold;
+    position: relative; /* Untuk efek hover */
 }
+
+nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -5px; /* Jarak dari teks */
+    height: 2px; /* Ketebalan garis */
+    background: white; /* Warna garis */
+    transform: scaleX(0); /* Awalnya tidak terlihat */
+    transition: transform 0.3s ease; /* Transisi halus */
+}
+
+nav a:hover::after {
+    transform: scaleX(1); /* Menampilkan garis saat hover */
+}
+
+
+/* Paket Wisata */
+.tour-card .content h3 {
+    font-family: 'Lora', serif; /* Menggunakan font Lora untuk judul paket */
+    transition: color 0.3s; /* Transisi halus untuk judul */
+}
+
+.tour-card .content p {
+    font-family: 'Roboto', sans-serif; /* Menggunakan font Roboto untuk deskripsi */
+    transition: color 0.3s; /* Transisi halus untuk deskripsi */
+}
+
 
 .hero {
     position: relative;
@@ -54,14 +109,88 @@ nav a {
     scroll-behavior: smooth; /* Smooth scrolling */
     padding: 10px 0; /* Optional padding */
 }
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 .tour-card {
     background: white;
     margin: 10px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     width: 300px;
     flex-shrink: 0; /* Prevent shrinking */
+    overflow: hidden; /* Menyembunyikan bagian yang melampaui */
+    transition: box-shadow 0.3s, transform 0.3s; /* Transisi halus */
+}
+
+.tour-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Bayangan lebih dalam */
+    transform: translateY(-5px); /* Mengangkat sedikit */
+}
+
+.tour-card img {
+    transition: transform 0.3s; /* Transisi halus untuk gambar */
+}
+
+.tour-card:hover img {
+    transform: scale(1.05); /* Memperbesar gambar sedikit saat hover */
+}
+
+.tour-card .content h3 {
+    transition: color 0.3s; /* Transisi halus untuk judul */
+}
+
+.tour-card:hover .content h3 {
+    color: #ba8814; /* Mengubah warna teks judul saat hover */
+}
+
+.tour-card .content p {
+    transition: color 0.3s; /* Transisi halus untuk deskripsi */
+}
+
+.tour-card:hover .content p {
+    color: #555; /* Mengubah warna teks deskripsi saat hover */
+}
+
+.detail-button {
+    background-color: #25D366;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 15px;
+    transition: background-color 0.3s, transform 0.3s; /* Transisi halus */
+}
+
+.detail-button:hover {
+    background-color: #1ebe57; /* Mengubah warna latar belakang tombol */
+    transform: scale(1.05); /* Memperbesar tombol sedikit saat hover */
+}
+
+
+.detail-button {
+    background-color: #25D366;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s; /* Transisi halus */
+}
+
+.detail-button:hover {
+    background-color: #1ebe57; /* Mengubah warna latar belakang tombol */
+    transform: scale(1.1); /* Memperbesar tombol saat hover */
 }
 
 .tour-card img {
