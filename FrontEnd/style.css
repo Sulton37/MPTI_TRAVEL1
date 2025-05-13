@@ -1,9 +1,7 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden; /* Pastikan tidak ada scroll horizontal */
+    overflow-x: hidden;
 }
 
 header {
@@ -16,7 +14,7 @@ header {
     align-items: center;
     color: white;
     position: relative;
-    z-index: 1; /* Membuat header berada di atas video */
+    z-index: 1;
 }
 
 @keyframes gradientBG {
@@ -27,68 +25,22 @@ header {
 
 header .logo {
     display: flex;
-    align-items: center; /* Memastikan logo dan teks berada di tengah */
-}
-
-header .logo {
-    position: relative; /* Ensure positioning for the pseudo-element */
+    align-items: center;
+    position: relative;
 }
 
 header .logo img {
-    height: 80px; /* Maintain size */
+    height: 80px;
     margin-bottom: 0;
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
-    transition:
-        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer; /* Indicate interactivity */
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
     filter: brightness(1);
-    z-index: 1; /* Ensure logo is above the glow */
+    z-index: 1;
 }
-
-/* Spotlight glow effect */
-header .logo img::before {
-    content: "";
-    position: absolute;
-    top: -5px; /* Adjusted for better alignment */
-    left: -5px; /* Adjusted for better alignment */
-    width: calc(100% + 10px); /* Slightly larger than the logo */
-    height: calc(100% + 10px); /* Slightly larger than the logo */
-    border-radius: 12px; /* Rounded corners */
-    pointer-events: none; /* Prevent interaction */
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3); /* Soft initial glow */
-    opacity: 0; /* Start hidden */
-    transition: opacity 0.4s ease; /* Smooth transition */
-    z-index: 0; /* Behind the logo */
-}
-
-/* Hover effect */
-header .logo img:hover {
-    transform: scale(1.05) rotate(-1deg); /* Slight zoom and tilt */
-    box-shadow: 0 6px 24px rgba(52, 152, 219, 0.25); /* Enhanced shadow */
-    filter: brightness(1.1); /* Brighten on hover */
-}
-
-header .logo img:hover::before {
-    opacity: 1; /* Show glow on hover */
-    animation: spotlightGlow 1.5s ease-in-out infinite; /* Pulsating effect */
-    box-shadow: 0 0 25px 10px rgba(52, 152, 219, 0.5); /* Stronger glow */
-}
-
-/* Pulsating glow animation */
-@keyframes spotlightGlow {
-    0%, 100% {
-        box-shadow: 0 0 25px 10px rgba(52, 152, 219, 0.5);
-        opacity: 1; /* Fully visible */
-    }
-    50% {
-        box-shadow: 0 0 35px 15px rgba(52, 152, 219, 0.7); /* Brighter glow */
-        opacity: 0.8; /* Slightly less visible */
-    }
-}
-
 
 header .logo span {
     font-size: 1.8em;
@@ -97,26 +49,23 @@ header .logo span {
     color: #ffffff;
     letter-spacing: 0.5px;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    text-shadow: 0 0 0 transparent; /* Awal tanpa shadow */
+    text-shadow: 0 0 0 transparent;
 }
 
-
-/* Efek mengkilap saat hover */
 header .logo span:hover {
-    color: #fff; /* Warna teks berubah putih */
-    text-shadow: 
-        0 0 8px rgba(255, 215, 0, 0.8), /* Kilau emas */
-        0 0 12px rgba(255, 255, 255, 0.6); /* Highlight putih */
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.8),
+                 0 0 12px rgba(255, 255, 255, 0.6);
     transform: scale(1.02);
 }
 
 nav a {
-    font-family: 'Roboto', sans-serif; /* Menggunakan font Roboto untuk navbar */
+    font-family: 'Roboto', sans-serif;
     color: white;
-    margin: 0 20px; /* Menambah jarak antar link */
+    margin: 0 20px;
     text-decoration: none;
     font-weight: bold;
-    position: relative; /* Untuk efek hover */
+    position: relative;
 }
 
 nav a::after {
@@ -124,89 +73,111 @@ nav a::after {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -5px; /* Jarak dari teks */
-    height: 2px; /* Ketebalan garis */
-    background: white; /* Warna garis */
-    transform: scaleX(0); /* Awalnya tidak terlihat */
-    transition: transform 0.3s ease; /* Transisi halus */
+    bottom: -5px;
+    height: 2px;
+    background: white;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
 nav a:hover::after {
-    transform: scaleX(1); /* Menampilkan garis saat hover */
+    transform: scaleX(1);
 }
 
-
-/* Paket Wisata */
 .tour-card .content h3 {
-    font-family: 'Lora', serif; /* Menggunakan font Lora untuk judul paket */
-    transition: color 0.3s; /* Transisi halus untuk judul */
+    font-family: 'Lora', serif;
+    transition: color 0.3s;
 }
 
 .tour-card .content p {
-    font-family: 'Roboto', sans-serif; /* Menggunakan font Roboto untuk deskripsi */
-    transition: color 0.3s; /* Transisi halus untuk deskripsi */
+    font-family: 'Roboto', sans-serif;
+    transition: color 0.3s;
 }
 
-
-/* Pastikan .hero mengisi seluruh layar */
 .hero {
     position: relative;
-    width: 100vw;  /* Memastikan lebar penuh viewport */
-    height: 100vh; /* Memastikan tinggi penuh viewport */
-    overflow: hidden;  /* Menyembunyikan bagian video yang keluar */
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Mengatur video agar mengisi layar penuh */
 .hero video {
-    position: fixed;  /* Menggunakan fixed supaya video tetap di belakang konten */
-    top: 0;
-    left: 0;
-    width: 100vw;  /* Mengisi seluruh lebar viewport */
-    height: 100vh; /* Mengisi seluruh tinggi viewport */
-    object-fit: cover; /* Agar video mengisi area tanpa distorsi */
-    z-index: -1; /* Menempatkan video di belakang konten lain */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    z-index: -1;
+    transform-origin: center center;
 }
 
+@media (max-aspect-ratio: 16/9) {
+    .hero video {
+        width: 100%;
+        height: auto;
+    }
+}
 
+@media (min-aspect-ratio: 16/9) {
+    .hero video {
+        width: auto;
+        height: 100%;
+    }
+}
 
+@media (min-width: 1200px) {
+    .hero video {
+        width: 100%;
+        height: 100%;
+        object-position: center;
+    }
+}
 
 .tour-section {
     padding: 40px 20px;
     background-color: #f5f5f5;
-    overflow: hidden; /* Hide overflow */
+    overflow: hidden;
 }
 
 .slider {
     display: flex;
-    overflow-x: auto; /* Enable horizontal scrolling */
-    scroll-behavior: smooth; /* Smooth scrolling */
-    padding: 10px 0; /* Optional padding */
-    min-width: 100%; /* Ensure it fills the container */
-    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 0;
+    min-width: 100%;
+    flex-wrap: nowrap;
 }
 
 .tour-card {
     background: white;
-    margin: 10px; /* Space between cards */
+    margin: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    flex: 0 0 calc(25% - 20px); /* 4 cards per row, adjust for margin */
-    max-width: calc(25% - 20px); /* Ensure max width for 4 cards */
+    flex: 0 0 calc(25% - 20px);
+    max-width: calc(25% - 20px);
     transition: box-shadow 0.3s, transform 0.3s;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .tour-card {
-        flex: 0 0 calc(50% - 20px); /* 2 cards per row on smaller screens */
+        flex: 0 0 calc(50% - 20px);
         max-width: calc(50% - 20px);
     }
 }
 
 @media (max-width: 480px) {
     .tour-card {
-        flex: 0 0 calc(100% - 20px); /* 1 card per row on very small screens */
+        flex: 0 0 calc(100% - 20px);
         max-width: calc(100% - 20px);
     }
 }
@@ -222,70 +193,38 @@ nav a:hover::after {
     }
 }
 
-
-
-.tour-card {
-    background: white;
-    margin: 10px; /* Space between cards */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    flex: 0 0 calc(25% - 20px); /* 4 cards per row, adjust for margin */
-    max-width: calc(25% - 20px); /* Ensure max width for 4 cards */
-    transition: box-shadow 0.3s, transform 0.3s;
-    position: relative;
-    display: flex; /* Enable flexbox */
-    flex-direction: column; /* Stack children vertically */
-}
-
-/* Image Slideshow Container */
 .image-slideshow {
     position: relative;
     width: 100%;
-    height: 300px; /* Fixed height for the slideshow */
+    height: 300px;
     overflow: hidden;
     border-radius: 8px 8px 0 0;
-    transform: translateZ(0); /* Optimasi hardware acceleration */
+    transform: translateZ(0);
 }
 
-/* Image Styling */
 .image-slideshow img {
     position: absolute;
     width: 100%;
-    height: 100%; /* Ensure all images fill the container */
-    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    height: 100%;
+    object-fit: cover;
     opacity: 0;
     transform: scale(1.05);
     transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     filter: brightness(0.95);
 }
 
-/* First image visible by default */
 .image-slideshow img:first-child {
     opacity: 1;
     transform: scale(1);
 }
 
-/* Smooth Slideshow Animation */
-.tour-card:hover .image-slideshow img:nth-child(1) {
-    animation: imageCycle 12s infinite 0s;
-}
-.tour-card:hover .image-slideshow img:nth-child(2) {
-    animation: imageCycle 12s infinite 2s;
-}
-.tour-card:hover .image-slideshow img:nth-child(3) {
-    animation: imageCycle 12s infinite 4s;
-}
-.tour-card:hover .image-slideshow img:nth-child(4) {
-    animation: imageCycle 12s infinite 6s;
-}
-.tour-card:hover .image-slideshow img:nth-child(5) {
-    animation: imageCycle 12s infinite 8s;
-}
-.tour-card:hover .image-slideshow img:nth-child(6) {
-    animation: imageCycle 12s infinite 10s;
-}
+.tour-card:hover .image-slideshow img:nth-child(1) { animation: imageCycle 12s infinite 0s; }
+.tour-card:hover .image-slideshow img:nth-child(2) { animation: imageCycle 12s infinite 2s; }
+.tour-card:hover .image-slideshow img:nth-child(3) { animation: imageCycle 12s infinite 4s; }
+.tour-card:hover .image-slideshow img:nth-child(4) { animation: imageCycle 12s infinite 6s; }
+.tour-card:hover .image-slideshow img:nth-child(5) { animation: imageCycle 12s infinite 8s; }
+.tour-card:hover .image-slideshow img:nth-child(6) { animation: imageCycle 12s infinite 10s; }
 
-/* Enhanced Animation Keyframes */
 @keyframes imageCycle {
     0% {
         opacity: 0;
@@ -312,7 +251,6 @@ nav a:hover::after {
     }
 }
 
-/* Card Hover Effects */
 .tour-card:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     transform: translateY(-8px);
@@ -322,20 +260,16 @@ nav a:hover::after {
     background: linear-gradient(to bottom, transparent, #e4e4e4 20%);
 }
 
-/* Content Transition */
 .content {
     padding: 20px;
     transition: all 0.5s ease;
     background: white;
-    flex-grow: 1; /* Allow content to grow and take available space */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Ensure that content takes up available space and button stays at the bottom */
+    justify-content: space-between;
 }
 
-
-
-/* Text Effects */
 .tour-card:hover .content h3 {
     color: #d4a017;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -346,20 +280,13 @@ nav a:hover::after {
     transform: translateY(-2px);
 }
 
-.tour-card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transform: translateY(-5px);
-}
-
 .tour-card .content {
     padding: 15px;
 }
 
-
-
 .detail-button {
     display: inline-block;
-    margin-top: auto; /* Push the button to the bottom */
+    margin-top: auto;
     padding: 8px 20px;
     background-color: #25D366;
     color: white;
@@ -373,27 +300,25 @@ nav a:hover::after {
 }
 
 .detail-button:hover {
-    background-color: #1ebe57; /* Slightly darker green */
-    transform: translateY(-4px) scale(1.05); /* Slight lift and grow effect */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
-    letter-spacing: 1px; /* Add space between letters to enhance hover effect */
+    background-color: #1ebe57;
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
 }
 
 .detail-button::after {
-    content: '→'; /* Add a right arrow to indicate action */
+    content: '→';
     position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 18px;
+    right: -20px;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transition: opacity 0.3s ease, right 0.3s ease;
 }
 
 .detail-button:hover::after {
     opacity: 1;
-    transform: translateY(-50%) translateX(5px); /* Move arrow to the right */
+    right: 10px;
 }
+
 
 
 .whatsapp-button {
