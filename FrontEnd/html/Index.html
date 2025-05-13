@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vacationland</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Lora:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
     <header>
         <div class="logo">
             <img src="../Asset/logo/logompti.png" alt="Vacationland Logo">
@@ -27,13 +24,14 @@
 
     <section class="hero">
         <video autoplay muted loop playsinline>
-            <source src="../Asset/video/video1.mp4" type="video/mp4" />
+            <source src="../Asset/video/video1.mp4" type="video/mp4">
             Your browser does not support the video tag.
-          </video>
+        </video>
     </section>
 
     <section class="tour-section">
         <div class="slider">
+            <!-- Tour Card 1 -->
             <div class="tour-card">
                 <div class="image-slideshow">
                     <img src="../Asset/Package_Culture/borobudur.jpg" alt="Borobudur">
@@ -52,6 +50,8 @@
                     <a href="borobudur.html" class="detail-button">More Details</a>
                 </div>
             </div>
+            
+            <!-- Tour Card 2 -->
             <div class="tour-card">
                 <div class="image-slideshow">
                     <img src="../Asset/Package_Culture/borobudur.jpg" alt="Borobudur">
@@ -68,11 +68,13 @@
                         Borobudur. That's just day one! Day two ignites your senses with a hands-on cultural workshop
                         (batik, gamelan, or dance) followed by an exhilarating Jeep Lava Tour on the powerful Mount
                         Merapi. Explore dramatic volcanic landscapes and soak in panoramic mountain views. This isn't
-                        just a trip – it's an imm ersive journey into the heart and soul of Java. Book your
+                        just a trip – it's an immersive journey into the heart and soul of Java. Book your
                         unforgettable Yogyakarta escape now!</p>
                     <a href="borobudur.html" class="detail-button">More Details</a>
                 </div>
             </div>
+            
+            <!-- Tour Card 3 -->
             <div class="tour-card">
                 <div class="image-slideshow">
                     <img src="../Asset/Package_Culture/borobudur.jpg" alt="Borobudur">
@@ -92,6 +94,8 @@
                     <a href="borobudur.html" class="detail-button">More Details</a>
                 </div>
             </div>
+            
+            <!-- Tour Card 4 -->
             <div class="tour-card">
                 <div class="image-slideshow">
                     <img src="../Asset/Package_Culture/borobudur.jpg" alt="Borobudur">
@@ -114,6 +118,8 @@
                     <a href="borobudur.html" class="detail-button">More Details</a>
                 </div>
             </div>
+            
+            <!-- Tour Card 5 -->
             <div class="tour-card">
                 <div class="image-slideshow">
                     <img src="../Asset/Package_Culture/borobudur.jpg" alt="Borobudur">
@@ -138,6 +144,7 @@
     <a href="https://wa.me/yourwhatsapplink" class="whatsapp-button">
         Booking via WhatsApp
     </a>
+
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-column">
@@ -177,6 +184,34 @@
         </div>
     </footer>
 
-</body>
+    <!-- Mobile Navigation Elements -->
+    <div class="mobile-menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
+    <div class="mobile-sidebar">
+        <div class="sidebar-header">
+            <img src="../Asset/logo/logompti.png" alt="Vacationland Logo">
+            <span>Vacationland</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#">🏠 Beranda</a>
+            <a href="#">✈️ Paket</a>
+            <a href="#">🏨 Rental</a>
+            <a href="#">👤 Profil</a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Copyright ©2025 Vacationland</p>
+        </div>
+    </div>
+    <div class="sidebar-overlay"></div>
+
+    <!-- JavaScript Files -->
+    <script src="../js/mobile-nav.js"></script>
+    <script src="../js/slider.js"></script>
+    <script src="../js/image-slideshow.js"></script>
+    <script src="../js/responsive-hero.js"></script>
+</body>
 </html>

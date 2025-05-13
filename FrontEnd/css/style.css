@@ -384,3 +384,196 @@ nav a:hover::after {
     padding-top: 15px;
     font-size: 13px;
 }
+
+/* Mobile Header Styles */
+@media (max-width: 768px) {
+    header {
+        padding: 10px 15px;
+    }
+    
+    header .logo img {
+        height: 50px;
+    }
+    
+    header .logo span {
+        font-size: 1.2em;
+    }
+    
+    nav {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 21px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    
+    .mobile-menu-toggle span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background: white;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+    
+    .hero {
+        height: 60vh;
+    }
+    
+    .tour-card {
+        flex: 0 0 calc(100% - 20px);
+        max-width: calc(100% - 20px);
+    }
+    
+    .image-slideshow {
+        height: 200px;
+    }
+    
+    .content {
+        padding: 15px;
+    }
+    
+    .content h3 {
+        font-size: 1.1em;
+    }
+    
+    .content p {
+        font-size: 0.9em;
+    }
+    
+    .detail-button {
+        padding: 6px 15px;
+        font-size: 0.9em;
+    }
+    
+    .footer-column {
+        flex: 0 0 100%;
+        margin-bottom: 20px;
+    }
+    
+    .payment-img {
+        width: 150px;
+    }
+}
+
+/* Mobile Sidebar Styles */
+.mobile-menu-toggle {
+    display: none;
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100%;
+    background: white;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: linear-gradient(-45deg, #3498db, #2980b9, #8dc6ff, #01f6c5);
+    background-size: 400% 400%;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-header img {
+    height: 40px;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.sidebar-header span {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.sidebar-nav a:hover {
+    background-color: #f0f0f0;
+    color: #2980b9;
+}
+
+.sidebar-footer {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.8em;
+    color: #777;
+    border-top: 1px solid #eee;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+/* Active states */
+body.sidebar-open {
+    overflow: hidden;
+}
+
+body.sidebar-open .mobile-sidebar {
+    left: 0;
+}
+
+body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.sidebar-open .mobile-menu-toggle span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+body.sidebar-open .mobile-menu-toggle span:nth-child(2) {
+    opacity: 0;
+}
+
+body.sidebar-open .mobile-menu-toggle span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* WhatsApp button adjustment for mobile */
+@media (max-width: 480px) {
+    .whatsapp-button {
+        padding: 8px 15px;
+        font-size: 14px;
+        bottom: 15px;
+        left: 15px;
+    }
+}
