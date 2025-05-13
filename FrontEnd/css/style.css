@@ -14,13 +14,21 @@ header {
     align-items: center;
     color: white;
     position: relative;
-    z-index: 1;
+    z-index: 900;
 }
 
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 header .logo {
@@ -35,8 +43,8 @@ header .logo img {
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     filter: brightness(1);
     z-index: 1;
@@ -55,7 +63,7 @@ header .logo span {
 header .logo span:hover {
     color: #fff;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.8),
-                 0 0 12px rgba(255, 255, 255, 0.6);
+        0 0 12px rgba(255, 255, 255, 0.6);
     transform: scale(1.02);
 }
 
@@ -187,6 +195,7 @@ nav a:hover::after {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -195,35 +204,68 @@ nav a:hover::after {
 
 .image-slideshow {
     position: relative;
-    width: 100%;
-    height: 300px;
     overflow: hidden;
-    border-radius: 8px 8px 0 0;
-    transform: translateZ(0);
+    height: 250px; /* Atur tinggi default */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .image-slideshow img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     object-fit: cover;
-    opacity: 0;
-    transform: scale(1.05);
-    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    filter: brightness(0.95);
+    border-radius: 12px;
 }
+
+/* Optional: Tambahkan efek dot jika nanti ingin pakai */
+.slideshow-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+}
+
+.slideshow-indicators .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    transition: background 0.3s ease;
+}
+
+.slideshow-indicators .dot.active {
+    background: rgba(255,255,255,0.9);
+}
+
 
 .image-slideshow img:first-child {
     opacity: 1;
     transform: scale(1);
 }
 
-.tour-card:hover .image-slideshow img:nth-child(1) { animation: imageCycle 12s infinite 0s; }
-.tour-card:hover .image-slideshow img:nth-child(2) { animation: imageCycle 12s infinite 2s; }
-.tour-card:hover .image-slideshow img:nth-child(3) { animation: imageCycle 12s infinite 4s; }
-.tour-card:hover .image-slideshow img:nth-child(4) { animation: imageCycle 12s infinite 6s; }
-.tour-card:hover .image-slideshow img:nth-child(5) { animation: imageCycle 12s infinite 8s; }
-.tour-card:hover .image-slideshow img:nth-child(6) { animation: imageCycle 12s infinite 10s; }
+.tour-card:hover .image-slideshow img:nth-child(1) {
+    animation: imageCycle 12s infinite 0s;
+}
+
+.tour-card:hover .image-slideshow img:nth-child(2) {
+    animation: imageCycle 12s infinite 2s;
+}
+
+.tour-card:hover .image-slideshow img:nth-child(3) {
+    animation: imageCycle 12s infinite 4s;
+}
+
+.tour-card:hover .image-slideshow img:nth-child(4) {
+    animation: imageCycle 12s infinite 6s;
+}
+
+.tour-card:hover .image-slideshow img:nth-child(5) {
+    animation: imageCycle 12s infinite 8s;
+}
+
+.tour-card:hover .image-slideshow img:nth-child(6) {
+    animation: imageCycle 12s infinite 10s;
+}
 
 @keyframes imageCycle {
     0% {
@@ -231,20 +273,24 @@ nav a:hover::after {
         transform: scale(1.05);
         filter: brightness(0.9) contrast(1.1);
     }
+
     8% {
         opacity: 1;
         transform: scale(1);
         filter: brightness(1) contrast(1);
     }
+
     30% {
         opacity: 1;
         transform: scale(1);
     }
+
     38% {
         opacity: 0;
         transform: scale(1.02);
         filter: brightness(1.05) contrast(1.05);
     }
+
     100% {
         opacity: 0;
         transform: scale(1.05);
@@ -272,7 +318,7 @@ nav a:hover::after {
 
 .tour-card:hover .content h3 {
     color: #d4a017;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tour-card:hover .content p {
@@ -335,6 +381,7 @@ nav a:hover::after {
     align-items: center;
     text-decoration: none;
 }
+
 .site-footer {
     background-color: #555;
     color: white;
@@ -367,7 +414,7 @@ nav a:hover::after {
     padding-left: 20px;
 }
 
-.footer-column p, 
+.footer-column p,
 .footer-column li {
     margin-bottom: 8px;
 }
@@ -385,187 +432,222 @@ nav a:hover::after {
     font-size: 13px;
 }
 
-/* Mobile Header Styles */
-@media (max-width: 768px) {
-    header {
-        padding: 10px 15px;
-    }
-    
-    header .logo img {
-        height: 50px;
-    }
-    
-    header .logo span {
-        font-size: 1.2em;
-    }
-    
-    nav {
-        display: none;
-    }
-    
-    .mobile-menu-toggle {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width: 30px;
-        height: 21px;
-        cursor: pointer;
-        z-index: 1001;
-    }
-    
-    .mobile-menu-toggle span {
-        display: block;
-        height: 3px;
-        width: 100%;
-        background: white;
-        border-radius: 3px;
-        transition: all 0.3s ease;
-    }
-    
-    .hero {
-        height: 60vh;
-    }
-    
-    .tour-card {
-        flex: 0 0 calc(100% - 20px);
-        max-width: calc(100% - 20px);
-    }
-    
-    .image-slideshow {
-        height: 200px;
-    }
-    
-    .content {
-        padding: 15px;
-    }
-    
-    .content h3 {
-        font-size: 1.1em;
-    }
-    
-    .content p {
-        font-size: 0.9em;
-    }
-    
-    .detail-button {
-        padding: 6px 15px;
-        font-size: 0.9em;
-    }
-    
-    .footer-column {
-        flex: 0 0 100%;
-        margin-bottom: 20px;
-    }
-    
-    .payment-img {
-        width: 150px;
-    }
-}
 
-/* Mobile Sidebar Styles */
+/* Mobile Menu Toggle - Improved with smooth hover effects */
 .mobile-menu-toggle {
     display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 32px;
+    height: 26px;
+    cursor: pointer;
+    z-index: 1001;
+    position: relative;
+    transition: transform 0.3s ease;
 }
 
+.mobile-menu-toggle:hover {
+    transform: scale(1.05);
+}
+
+.mobile-menu-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 4px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform-origin: left center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile Sidebar - Enhanced design with glassmorphism effect */
 .mobile-sidebar {
     position: fixed;
     top: 0;
-    left: -300px;
-    width: 280px;
+    left: -320px;
+    width: 320px;
     height: 100%;
-    background: white;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     z-index: 1000;
-    transition: all 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.15);
+    will-change: transform;
+    padding-top: 85px;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.sidebar-header {
-    padding: 20px;
-    background: linear-gradient(-45deg, #3498db, #2980b9, #8dc6ff, #01f6c5);
-    background-size: 400% 400%;
-    color: white;
-    display: flex;
-    align-items: center;
+/* Custom scrollbar for sidebar */
+.mobile-sidebar::-webkit-scrollbar {
+    width: 6px;
 }
 
-.sidebar-header img {
-    height: 40px;
-    margin-right: 10px;
-    border-radius: 5px;
+.mobile-sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
 }
 
-.sidebar-header span {
-    font-weight: bold;
-    font-size: 1.2em;
+.mobile-sidebar::-webkit-scrollbar-thumb {
+    background: var(--accent, #3498db);
+    border-radius: 10px;
 }
 
 .sidebar-nav {
-    flex-grow: 1;
-    padding: 20px 0;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
 }
 
+/* Enhanced navigation links with better visual feedback */
 .sidebar-nav a {
-    display: block;
-    padding: 12px 20px;
-    color: #333;
+    padding: 16px 20px;
+    color: var(--dark, #333);
     text-decoration: none;
     font-weight: 500;
-    transition: all 0.3s;
+    font-size: 1.05rem;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+    border-left: 0px solid var(--accent, #3498db);
+}
+
+.sidebar-nav a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.15), transparent);
+    transition: all 0.6s ease;
 }
 
 .sidebar-nav a:hover {
-    background-color: #f0f0f0;
-    color: #2980b9;
+    background: rgba(52, 152, 219, 0.08);
+    transform: translateX(5px);
+    border-left: 4px solid var(--accent, #3498db);
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.1);
 }
 
-.sidebar-footer {
-    padding: 15px;
+.sidebar-nav a:hover::before {
+    left: 100%;
+}
+
+.sidebar-nav a:active {
+    transform: scale(0.98) translateX(5px);
+}
+
+.sidebar-nav a i {
+    font-size: 1.4rem;
+    color: var(--accent, #3498db);
+    min-width: 30px;
     text-align: center;
-    font-size: 0.8em;
-    color: #777;
-    border-top: 1px solid #eee;
+    transition: transform 0.3s ease;
 }
 
+.sidebar-nav a:hover i {
+    transform: scale(1.1);
+}
+
+/* Enhanced overlay with improved blur effect */
 .sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 999;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s;
+    transition: all 0.4s ease;
 }
 
-/* Active states */
-body.sidebar-open {
-    overflow: hidden;
+/* Mobile Styles with improved animations */
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    /* When sidebar is open */
+    body.sidebar-open {
+        position: fixed;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    body.sidebar-open .mobile-sidebar {
+        left: 0;
+        animation: slidein 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    @keyframes slidein {
+        0% {
+            left: -320px;
+            opacity: 0.5;
+        }
+        100% {
+            left: 0;
+            opacity: 1;
+        }
+    }
+    
+    body.sidebar-open .sidebar-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Enhanced hamburger animation */
+    body.sidebar-open .mobile-menu-toggle span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 0px);
+        width: 120%;
+        background: var(--accent, #3498db);
+    }
+    
+    body.sidebar-open .mobile-menu-toggle span:nth-child(2) {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    
+    body.sidebar-open .mobile-menu-toggle span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, 0px);
+        width: 120%;
+        background: var(--accent, #3498db);
+    }
+    
+    /* Active menu item styling */
+    .sidebar-nav a.active {
+        background: rgba(52, 152, 219, 0.1);
+        border-left: 4px solid var(--accent, #3498db);
+    }
 }
 
-body.sidebar-open .mobile-sidebar {
-    left: 0;
-}
-
-body.sidebar-open .sidebar-overlay {
-    opacity: 1;
-    visibility: visible;
-}
-
-body.sidebar-open .mobile-menu-toggle span:nth-child(1) {
-    transform: translateY(9px) rotate(45deg);
-}
-
-body.sidebar-open .mobile-menu-toggle span:nth-child(2) {
-    opacity: 0;
-}
-
-body.sidebar-open .mobile-menu-toggle span:nth-child(3) {
-    transform: translateY(-9px) rotate(-45deg);
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .mobile-sidebar {
+        background: rgba(25, 25, 30, 0.9);
+    }
+    
+    .sidebar-nav a {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sidebar-nav a:hover {
+        background: rgba(52, 152, 219, 0.15);
+    }
 }
 
 /* WhatsApp button adjustment for mobile */
