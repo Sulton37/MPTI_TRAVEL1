@@ -5,16 +5,29 @@ body {
 }
 
 header {
+    position: fixed;
+    top: 0;
+    width: 100%;
     background: linear-gradient(-45deg, #3498db, #2980b9, #8dc6ff, #01f6c5);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
-    padding: 15px 20px;
+    padding: 15px 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: white;
-    position: relative;
-    z-index: 900;
+    z-index: 1000;
+    /* pastikan di atas elemen lain */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+}
+
+
+header.scrolled {
+    padding: 10px 10px;
+    background: linear-gradient(-45deg, #2980b9, #3498db);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
 }
 
 @keyframes gradientBG {
@@ -75,7 +88,7 @@ header .logo span {
 header .logo:hover span {
     color: #fff;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.8),
-                0 0 12px rgba(255, 255, 255, 0.6);
+        0 0 12px rgba(255, 255, 255, 0.6);
     transform: scale(1.02);
 }
 
@@ -87,7 +100,7 @@ header .logo span::after {
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, rgba(255,215,0,0.8), rgba(255,255,255,0.6));
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.8), rgba(255, 255, 255, 0.6));
     transition: width 0.4s ease;
 }
 
@@ -101,20 +114,43 @@ header .logo:hover img {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
+
 .logo-clicked {
     animation: logoClick 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 @keyframes logoClick {
-    0% { transform: scale(1); }
-    25% { transform: scale(0.95); }
-    50% { transform: scale(1.05); }
-    75% { transform: scale(0.98); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(0.95);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    75% {
+        transform: scale(0.98);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 nav a {
@@ -260,9 +296,10 @@ nav a:hover::after {
 .image-slideshow {
     position: relative;
     overflow: hidden;
-    height: 250px; /* Atur tinggi default */
+    height: 250px;
+    /* Atur tinggi default */
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .image-slideshow img {
@@ -284,12 +321,12 @@ nav a:hover::after {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.5);
+    background: rgba(255, 255, 255, 0.5);
     transition: background 0.3s ease;
 }
 
 .slideshow-indicators .dot.active {
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.9);
 }
 
 
@@ -437,7 +474,8 @@ nav a:hover::after {
     align-items: center;
     text-decoration: none;
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-    z-index: 9999; /* Pastikan selalu di atas elemen lain */
+    z-index: 1000;
+    /* Pastikan selalu di atas elemen lain */
     transition: all 0.3s ease;
     overflow: hidden;
 }
@@ -481,9 +519,17 @@ nav a:hover::after {
 
 /* Animasi floating */
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
 .whatsapp-button {
@@ -498,7 +544,7 @@ nav a:hover::after {
         padding: 10px 15px 10px 12px;
         font-size: 14px;
     }
-    
+
     .whatsapp-button i {
         font-size: 20px;
         margin-right: 8px;
@@ -589,7 +635,8 @@ nav a:hover::after {
     text-align: center;
 }
 
-.hours-section, .services-section {
+.hours-section,
+.services-section {
     margin-bottom: 25px;
 }
 
@@ -631,7 +678,7 @@ nav a:hover::after {
     background: white;
     padding: 5px;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .newsletter-form {
@@ -700,20 +747,20 @@ nav a:hover::after {
         flex-direction: column;
         gap: 30px;
     }
-    
+
     .footer-column {
         min-width: 100%;
     }
-    
+
     .newsletter-form {
         flex-direction: column;
     }
-    
+
     .newsletter-form input,
     .newsletter-form button {
         border-radius: 4px;
     }
-    
+
     .newsletter-form button {
         margin-top: 10px;
         padding: 10px;
@@ -722,31 +769,73 @@ nav a:hover::after {
 
 /* Mobile Menu Toggle - Improved with smooth hover effects */
 .mobile-menu-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 24px;
     display: none;
     flex-direction: column;
     justify-content: space-between;
-    width: 32px;
-    height: 26px;
     cursor: pointer;
-    z-index: 1001;
-    position: relative;
-    transition: transform 0.3s ease;
+    z-index: 1100;
+    transition: all 0.3s ease;
 }
 
 .mobile-menu-toggle:hover {
     transform: scale(1.05);
 }
 
+
 .mobile-menu-toggle span {
     display: block;
     height: 3px;
     width: 100%;
     background: #ffffff;
-    border-radius: 4px;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    transform-origin: left center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    transition: all 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+    transform-origin: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
+
+/* Hamburger to Close Animation */
+body.sidebar-open .mobile-menu-toggle span:nth-child(1) {
+    transform: translateY(10.5px) rotate(45deg);
+    background: #3498db;
+}
+
+body.sidebar-open .mobile-menu-toggle span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+body.sidebar-open .mobile-menu-toggle span:nth-child(3) {
+    transform: translateY(-10.5px) rotate(-45deg);
+    background: #3498db;
+}
+
+/* Hover Effects */
+.mobile-menu-toggle:hover span {
+    background: #f8f8f8;
+}
+
+.mobile-menu-toggle:hover span:nth-child(1) {
+    transform: translateY(-1px);
+}
+
+.mobile-menu-toggle:hover span:nth-child(3) {
+    transform: translateY(1px);
+}
+
+/* When sidebar is open */
+body.sidebar-open .mobile-menu-toggle {
+    right: 25px; /* Slightly adjust position when open */
+}
+
+body.sidebar-open .mobile-menu-toggle:hover span {
+    background: #2980b9;
+}
+
 
 /* Mobile Sidebar - Enhanced design with glassmorphism effect */
 .mobile-sidebar {
@@ -758,7 +847,7 @@ nav a:hover::after {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    z-index: 1000;
+    z-index: 1100;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 0 35px rgba(0, 0, 0, 0.15);
     will-change: transform;
@@ -864,62 +953,66 @@ nav a:hover::after {
     .desktop-nav {
         display: none;
     }
-    
+
+    header {
+        padding: 12px 15px;
+    }
+
+
     .mobile-menu-toggle {
         display: flex;
     }
-    
+
+    header.scrolled {
+        padding: 8px 15px;
+    }
+
     /* When sidebar is open */
     body.sidebar-open {
         position: fixed;
         width: 100%;
         overflow: hidden;
     }
-    
+
     body.sidebar-open .mobile-sidebar {
         left: 0;
-        animation: slidein 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    
+
     @keyframes slidein {
         0% {
             left: -320px;
             opacity: 0.5;
         }
+
         100% {
             left: 0;
             opacity: 1;
         }
     }
-    
+
     body.sidebar-open .sidebar-overlay {
         opacity: 1;
         visibility: visible;
     }
-    
-    /* Enhanced hamburger animation */
-    body.sidebar-open .mobile-menu-toggle span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 0px);
-        width: 120%;
-        background: var(--accent, #3498db);
+
+    /* More precise animation timing */
+    body.sidebar-open .mobile-menu-toggle span:nth-child(1),
+    body.sidebar-open .mobile-menu-toggle span:nth-child(3) {
+        transition-delay: 0.1s;
     }
     
     body.sidebar-open .mobile-menu-toggle span:nth-child(2) {
-        opacity: 0;
-        transform: translateX(-20px);
+        transition: opacity 0.2s ease, transform 0.3s ease;
     }
-    
-    body.sidebar-open .mobile-menu-toggle span:nth-child(3) {
-        transform: rotate(-45deg) translate(5px, 0px);
-        width: 120%;
-        background: var(--accent, #3498db);
-    }
-    
+
     /* Active menu item styling */
     .sidebar-nav a.active {
         background: rgba(52, 152, 219, 0.1);
         border-left: 4px solid var(--accent, #3498db);
     }
+
+
 }
 
 /* Dark mode support */
@@ -927,11 +1020,11 @@ nav a:hover::after {
     .mobile-sidebar {
         background: rgba(25, 25, 30, 0.9);
     }
-    
+
     .sidebar-nav a {
         color: rgba(255, 255, 255, 0.9);
     }
-    
+
     .sidebar-nav a:hover {
         background: rgba(52, 152, 219, 0.15);
     }
