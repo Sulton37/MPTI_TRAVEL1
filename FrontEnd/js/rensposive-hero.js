@@ -35,3 +35,29 @@ document.addEventListener('DOMContentLoaded', function() {
         adjustVideoSize();
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const logo = document.querySelector('header .logo');
+    
+    if (logo) {
+        // Add mouse move parallax effect
+        logo.addEventListener('mousemove', (e) => {
+            const xAxis = (e.offsetX - logo.offsetWidth / 2) / 20;
+            const yAxis = (e.offsetY - logo.offsetHeight / 2) / 20;
+            logo.style.transform = `perspective(500px) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+        });
+        
+        // Reset on mouse leave
+        logo.addEventListener('mouseleave', () => {
+            logo.style.transform = 'perspective(500px) rotateY(0) rotateX(0)';
+        });
+        
+        // Add click effect
+        logo.addEventListener('click', () => {
+            logo.classList.add('logo-clicked');
+            setTimeout(() => {
+                logo.classList.remove('logo-clicked');
+            }, 1000);
+        });
+    }
+});

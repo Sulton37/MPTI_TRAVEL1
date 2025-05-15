@@ -35,3 +35,47 @@ document.addEventListener('DOMContentLoaded', function () {
         setInterval(cycleImages, interval);
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const mainImage = document.getElementById("main-image");
+  const thumbnails = document.querySelectorAll(".thumb");
+
+  let currentIndex = 0;
+  let autoRotate = true;
+
+  function showImage(index) {
+    const selectedThumb = thumbnails[index];
+    const newSrc = selectedThumb.getAttribute("src");
+    mainImage.setAttribute("src", newSrc);
+
+    thumbnails.forEach(t => t.classList.remove("active"));
+    selectedThumb.classList.add("active");
+  }
+
+  // Inisialisasi pertama
+  showImage(currentIndex);
+
+  // Autoplay slideshow
+  const intervalTime = 4000; // 4 detik
+  let slideshowInterval = setInterval(() => {
+    if (autoRotate) {
+      currentIndex = (currentIndex + 1) % thumbnails.length;
+      showImage(currentIndex);
+    }
+  }, intervalTime);
+
+  // Klik manual pada thumbnail
+  thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener("click", function () {
+      autoRotate = false;
+      currentIndex = index;
+      showImage(currentIndex);
+
+      // Aktifkan ulang autoplay setelah 10 detik
+      clearTimeout(window.resumeTimeout);
+      window.resumeTimeout = setTimeout(() => {
+        autoRotate = true;
+      }, 10000);
+    });
+  });
+});
