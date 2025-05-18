@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const overlay = document.querySelector(".sidebar-overlay");
   const body = document.body;
   const header = document.querySelector("header");
+
+  // Scroll effect for header
   window.addEventListener("scroll", function () {
     if (window.scrollY > 50) {
       header.classList.add("scrolled");
@@ -12,18 +14,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Toggle sidebar open/close
   toggle.addEventListener("click", function (e) {
     e.stopPropagation();
+    toggle.classList.toggle("active");
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
     body.classList.toggle("sidebar-open");
   });
 
+  // Close sidebar if click on overlay
   overlay.addEventListener("click", function () {
+    toggle.classList.remove("active");
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
     body.classList.remove("sidebar-open");
   });
 
-  // Close sidebar when clicking outside
+  // Close sidebar if click outside sidebar and toggle
   document.addEventListener("click", function (e) {
-    if (!sidebar.contains(e.target) && e.target !== toggle) {
+    if (
+      !sidebar.contains(e.target) &&
+      e.target !== toggle &&
+      sidebar.classList.contains("active")
+    ) {
+      toggle.classList.remove("active");
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
       body.classList.remove("sidebar-open");
     }
   });

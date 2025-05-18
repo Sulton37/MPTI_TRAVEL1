@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vacationland Company Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../../Asset/logo/logompti.png" alt="Vacationland Logo" />
+            <span>Vacationland</span>
+        </div>
+        <!-- Navigation for Desktop (hidden on mobile) -->
+        <nav class="desktop-nav">
+            <a href="Index.html">🏠 Home</a>
+            <a href="Index.html#paket">✈️ Packages</a>
+            <a href="profile.html">👤 Profile</a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="mobile-menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Tambahkan sidebar mobile dan overlay di sini -->
+    <nav class="mobile-sidebar">
+        <a href="Index.html">🏠 Home</a>
+        <a href="Index.html#paket">✈️ Packages</a>
+        <a href="profile.html">👤 Profile</a>
+    </nav>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="container">
+        <!-- Konten utama -->
+        <section class="profile-header">
+            <h1>Vacationland - Explore the World with Us</h1>
+            <p>
+                Vacationland is a travel company committed to delivering unforgettable holiday experiences with the best service,
+                comprehensive tour packages, and friendly customer care. We combine local cultural beauty and popular travel destinations for you.
+            </p>
+        </section>
+
+        <section class="gallery">
+            <div class="gallery-background"></div>
+            <div class="gallery-main">
+                <img id="main-photo" src="../../Asset/Package_Culture/borobudur.jpg" alt="Main Gallery Photo" />
+            </div>
+        </section>
+    </main>
+
+    <button id="admin-login-btn">Admin Login</button>
+
+    <div id="login-modal">
+        <div class="login-box">
+            <span class="login-close" id="login-close">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <input type="text" placeholder="Username" required />
+                <input type="password" placeholder="Password" required />
+                <button type="submit">Log In</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/profile.js"></script>
+    <script src="../js/mobile-nav.js"></script>
+</body>
+
+
+</html>
