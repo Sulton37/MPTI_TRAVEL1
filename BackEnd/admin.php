@@ -7,14 +7,13 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// Koneksi database dengan error handling
+// Database connection
 $koneksi = new mysqli("localhost", "root", "", "paket_travel");
-
 if ($koneksi->connect_error) {
     die("Koneksi gagal: " . $koneksi->connect_error);
 }
 
-// Tampilkan pesan berdasarkan parameter URL
+// Display messages
 $message = '';
 if (isset($_GET['success'])) {
     $message = '<div class="success">Paket berhasil ditambahkan!</div>';
@@ -71,6 +70,20 @@ if (isset($_GET['hapus'])) {
             }
         }
         
+        // Delete gallery photos
+        $galleryStmt = $koneksi->prepare("SELECT photo_filename FROM package_gallery WHERE package_id = ?");
+        $galleryStmt->bind_param("i", $id);
+        $galleryStmt->execute();
+        $galleryResult = $galleryStmt->get_result();
+        
+        while ($galleryRow = $galleryResult->fetch_assoc()) {
+            $galleryPath = "uploads/gallery/" . $galleryRow['photo_filename'];
+            if (file_exists($galleryPath)) {
+                unlink($galleryPath);
+            }
+        }
+        $galleryStmt->close();
+        
         // Delete from database
         $deleteStmt = $koneksi->prepare("DELETE FROM paket WHERE id = ?");
         $deleteStmt->bind_param("i", $id);
@@ -92,1106 +105,7 @@ if (isset($_GET['hapus'])) {
     <title>Admin Panel | Vacationland</title>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(-45deg, #f8f9fa, #e9ecef, #dee2e6, #ced4da);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .admin-header {
-            background: linear-gradient(-45deg, #3498db, #2980b9, #8dc6ff, #01f6c5);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: white;
-            padding: 20px 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-section img {
-            height: 50px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo-section h1 {
-            font-family: 'Lora', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 1rem;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 10px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        .admin-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .section-title {
-            font-family: 'Lora', serif;
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #3498db;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            padding: 15px;
-            border: 2px solid #e8ecef;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px;
-            border: 2px dashed #3498db;
-            border-radius: 12px;
-            background: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            justify-content: center;
-        }
-
-        .file-input-label:hover {
-            background: #e3f2fd;
-            border-color: #2980b9;
-        }
-
-        .submit-btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .submit-btn:hover {
-            background: linear-gradient(45deg, #2980b9, #3498db);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-        }
-
-        .packages-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .package-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .package-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .package-image {
-            height: 200px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .package-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .package-card:hover .package-image img {
-            transform: scale(1.05);
-        }
-
-        .package-content {
-            padding: 20px;
-        }
-
-        .package-title {
-            font-family: 'Lora', serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .package-description {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .package-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .delete-btn {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .delete-btn:hover {
-            background: linear-gradient(45deg, #c0392b, #e74c3c);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-        }
-
-        .view-btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .view-btn:hover {
-            background: linear-gradient(45deg, #2980b9, #3498db);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .error {
-            background: linear-gradient(45deg, #fee, #fdd);
-            color: #c33;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border-left: 4px solid #e74c3c;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-        }
-
-        .success {
-            background: linear-gradient(45deg, #efe, #dfd);
-            color: #2d5;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border-left: 4px solid #27ae60;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .no-packages {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
-        }
-
-        .no-packages i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: #3498db;
-        }
-
-        .upload-info {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border-left: 4px solid #3498db;
-        }
-
-        .upload-info small {
-            color: #1565c0;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .photo-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(52, 152, 219, 0.9);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .no-image-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-            background: #f8f9fa;
-            color: #666;
-        }
-
-        .no-image-placeholder i {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        /* Itinerary Builder Styles */
-        .itinerary-builder {
-            border: 2px solid #e8ecef;
-            border-radius: 15px;
-            padding: 20px;
-            background: #f8f9fa;
-        }
-
-        .itinerary-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .add-day-btn, .reset-itinerary-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .add-day-btn:hover {
-            background: linear-gradient(45deg, #20c997, #28a745);
-            transform: translateY(-2px);
-        }
-
-        .reset-itinerary-btn {
-            background: linear-gradient(45deg, #6c757d, #495057);
-        }
-
-        .reset-itinerary-btn:hover {
-            background: linear-gradient(45deg, #495057, #6c757d);
-        }
-
-        .day-counter {
-            margin-left: auto;
-            font-weight: 600;
-            color: #2980b9;
-        }
-
-        .itinerary-days {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .day-card {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .day-header {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .day-title {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .remove-day-btn {
-            background: rgba(231, 76, 60, 0.8);
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .remove-day-btn:hover {
-            background: #e74c3c;
-            transform: scale(1.1);
-        }
-
-        .day-content {
-            padding: 20px;
-        }
-
-        .activities-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .activity-item {
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        }
-
-        .time-selector {
-            min-width: 140px;
-        }
-
-        .time-selector select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            background: white;
-            font-size: 0.9rem;
-        }
-
-        .activity-input {
-            flex: 1;
-        }
-
-        .activity-input input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .activity-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .add-activity-btn, .remove-activity-btn {
-            width: 30px;
-            height: 30px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-        }
-
-        .add-activity-btn {
-            background: #28a745;
-            color: white;
-        }
-
-        .add-activity-btn:hover {
-            background: #20c997;
-            transform: scale(1.1);
-        }
-
-        .remove-activity-btn {
-            background: #dc3545;
-            color: white;
-        }
-
-        .remove-activity-btn:hover {
-            background: #c82333;
-            transform: scale(1.1);
-        }
-
-        .add-activity-to-day {
-            margin-top: 15px;
-            padding: 10px;
-            background: #e3f2fd;
-            border: 1px dashed #3498db;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #2980b9;
-            font-weight: 600;
-        }
-
-        .add-activity-to-day:hover {
-            background: #bbdefb;
-            border-color: #2980b9;
-        }
-
-        /* Enhanced Form Styling - User Friendly */
-.form-section {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 25px;
-    position: relative;
-}
-
-.subsection-title {
-    font-family: 'Lora', serif;
-    font-size: 1.3rem;
-    color: #2c3e50;
-    margin-bottom: 15px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #3498db;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.section-description {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 20px;
-    padding: 10px;
-    background: #e3f2fd;
-    border-left: 4px solid #3498db;
-    border-radius: 4px;
-}
-
-.form-grid-two {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.form-group label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.required {
-    color: #e74c3c;
-    font-weight: bold;
-}
-
-.form-help {
-    color: #666;
-    font-size: 0.85rem;
-    margin-top: 5px;
-    line-height: 1.4;
-}
-
-.price-input-wrapper {
-    display: flex;
-    align-items: center;
-    border: 2px solid #e8ecef;
-    border-radius: 12px;
-    background: #f8f9fa;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.price-input-wrapper:focus-within {
-    border-color: #3498db;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.currency-symbol {
-    background: #3498db;
-    color: white;
-    padding: 15px;
-    font-weight: 600;
-}
-
-.price-input-wrapper input {
-    border: none;
-    padding: 15px;
-    flex: 1;
-    background: transparent;
-    font-size: 1rem;
-}
-
-.price-input-wrapper input:focus {
-    outline: none;
-}
-
-.price-suffix {
-    padding: 15px;
-    color: #666;
-    font-style: italic;
-}
-
-/* File Upload Area */
-.file-upload-area {
-    border: 3px dashed #3498db;
-    border-radius: 15px;
-    padding: 40px 20px;
-    text-align: center;
-    background: #f8f9fa;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.file-upload-area:hover {
-    background: #e3f2fd;
-    border-color: #2980b9;
-}
-
-.file-upload-area.dragover {
-    background: #e3f2fd;
-    border-color: #2980b9;
-    transform: scale(1.02);
-}
-
-.file-upload-area input[type="file"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.upload-content h4 {
-    margin: 10px 0;
-    color: #2c3e50;
-}
-
-.upload-content p {
-    color: #666;
-    margin-bottom: 15px;
-}
-
-.upload-icon {
-    font-size: 3rem;
-    color: #3498db;
-    margin-bottom: 15px;
-}
-
-.upload-requirements {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
-
-.req-item {
-    background: #e8f5e8;
-    color: #27ae60;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.photo-preview {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.photo-item {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background: #f8f9fa;
-}
-
-.photo-item img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-}
-
-.photo-remove {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-}
-
-.photo-info {
-    padding: 8px;
-    font-size: 0.8rem;
-    color: #666;
-    text-align: center;
-}
-
-/* Itinerary Builder */
-.itinerary-builder {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-}
-
-.itinerary-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.btn-add-day, .btn-reset {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-add-day {
-    background: linear-gradient(45deg, #28a745, #20c997);
-    color: white;
-}
-
-.btn-add-day:hover {
-    background: linear-gradient(45deg, #20c997, #28a745);
-    transform: translateY(-2px);
-}
-
-.btn-reset {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-reset:hover {
-    background: #5a6268;
-}
-
-.day-counter {
-    margin-left: auto;
-    font-weight: 600;
-    color: #2980b9;
-    background: #e3f2fd;
-    padding: 8px 15px;
-    border-radius: 20px;
-}
-
-.day-card {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.day-card-header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.day-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-.btn-remove-day {
-    background: rgba(231, 76, 60, 0.8);
-    color: white;
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.day-content {
-    padding: 20px;
-}
-
-.activity-item {
-    display: flex;
-    gap: 15px;
-    align-items: flex-start;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border-left: 4px solid #3498db;
-}
-
-.time-input {
-    min-width: 140px;
-}
-
-.time-input select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    background: white;
-}
-
-.activity-input {
-    flex: 1;
-}
-
-.activity-input input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-}
-
-.activity-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.btn-activity {
-    width: 30px;
-    height: 30px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-}
-
-.btn-add-activity {
-    background: #28a745;
-    color: white;
-}
-
-.btn-remove-activity {
-    background: #dc3545;
-    color: white;
-}
-
-.add-activity-btn {
-    margin-top: 10px;
-    padding: 10px;
-    background: #e3f2fd;
-    border: 1px dashed #3498db;
-    border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-    color: #2980b9;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.add-activity-btn:hover {
-    background: #bbdefb;
-}
-
-/* Form Actions */
-.form-actions {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #e9ecef;
-}
-
-.btn-preview, .btn-submit {
-    padding: 15px 30px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 180px;
-    justify-content: center;
-}
-
-.btn-preview {
-    background: linear-gradient(45deg, #17a2b8, #138496);
-    color: white;
-}
-
-.btn-preview:hover {
-    background: linear-gradient(45deg, #138496, #17a2b8);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
-}
-
-.btn-submit {
-    background: linear-gradient(45deg, #28a745, #20c997);
-    color: white;
-}
-
-.btn-submit:hover {
-    background: linear-gradient(45deg, #20c997, #28a745);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .form-grid-two {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .btn-preview, .btn-submit {
-        min-width: auto;
-    }
-    
-    .upload-requirements {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .itinerary-controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .activity-item {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .activity-actions {
-        flex-direction: row;
-        align-self: center;
-    }
-}
-
-/* Character Counter */
-#desc-counter {
-    font-weight: 600;
-    color: #3498db;
-}
-
-/* Loading States */
-.uploading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.upload-progress {
-    width: 100%;
-    height: 4px;
-    background: #e9ecef;
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-.upload-progress-bar {
-    height: 100%;
-    background: linear-gradient(45deg, #3498db, #2980b9);
-    width: 0%;
-    transition: width 0.3s ease;
-}
-    </style>
+    <link rel="stylesheet" href="admin-styles.css?v=<?= time() ?>">
 </head>
 <body>
     <header class="admin-header">
@@ -1212,6 +126,7 @@ if (isset($_GET['hapus'])) {
     <div class="container">
         <?= $message ?>
 
+        <!-- Form Tambah Paket -->
         <div class="admin-section">
             <h2 class="section-title">
                 <i class="fas fa-plus-circle"></i> Tambah Paket Wisata Baru
@@ -1227,119 +142,82 @@ if (isset($_GET['hapus'])) {
                     <div class="form-grid-two">
                         <div class="form-group">
                             <label for="nama">
-                                <i class="fas fa-tag"></i> Nama Paket Wisata
-                                <span class="required">*</span>
+                                <i class="fas fa-tag"></i> Nama Paket <span class="required">*</span>
                             </label>
-                            <input type="text" 
-                                   id="nama" 
-                                   name="nama" 
-                                   required 
-                                   maxlength="255"
-                                   placeholder="Contoh: Wisata Candi Borobudur 2 Hari 1 Malam">
-                            <small class="form-help">Berikan nama yang menarik dan jelas untuk paket wisata</small>
+                            <input type="text" id="nama" name="nama" required maxlength="255" 
+                                   placeholder="Contoh: 2D1N Paket Wisata Yogyakarta">
                         </div>
                         
                         <div class="form-group">
                             <label for="duration">
-                                <i class="fas fa-clock"></i> Durasi Perjalanan
-                                <span class="required">*</span>
+                                <i class="fas fa-clock"></i> Durasi Paket <span class="required">*</span>
                             </label>
                             <select id="duration" name="duration" required onchange="updateItineraryDays()">
-                                <option value="">-- Pilih Durasi --</option>
-                                <option value="1D">1 Hari (Tidak menginap)</option>
+                                <option value="1D0N">1 Hari (Tanpa Menginap)</option>
                                 <option value="2D1N" selected>2 Hari 1 Malam</option>
                                 <option value="3D2N">3 Hari 2 Malam</option>
                                 <option value="4D3N">4 Hari 3 Malam</option>
                                 <option value="5D4N">5 Hari 4 Malam</option>
-                                <option value="custom">Durasi Lainnya</option>
                             </select>
-                            <small class="form-help">Pilih berapa lama paket wisata ini berlangsung</small>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="deskripsi">
-                            <i class="fas fa-edit"></i> Deskripsi Paket
-                            <span class="required">*</span>
+                            <i class="fas fa-align-left"></i> Deskripsi Paket <span class="required">*</span>
                         </label>
-                        <textarea id="deskripsi" 
-                                  name="deskripsi" 
-                                  rows="4" 
-                                  required 
-                                  maxlength="1000"
-                                  placeholder="Jelaskan secara singkat tentang paket wisata ini. Misalnya: Nikmati keindahan candi bersejarah dan budaya Jawa yang autentik dalam perjalanan 2 hari yang tak terlupakan..."></textarea>
-                        <small class="form-help">
-                            <span id="desc-counter">0</span>/1000 karakter. 
-                            Ceritakan pengalaman menarik yang akan didapat wisatawan.
-                        </small>
+                        <textarea id="deskripsi" name="deskripsi" rows="4" required maxlength="1000" 
+                                  placeholder="Deskripsikan paket wisata ini secara menarik dan informatif"></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="price">
-                            <i class="fas fa-money-bill-wave"></i> Harga per Orang (Rupiah)
+                            <i class="fas fa-money-bill-wave"></i> Harga Paket
                         </label>
                         <div class="price-input-wrapper">
                             <span class="currency-symbol">Rp</span>
-                            <input type="number" 
-                                   id="price" 
-                                   name="price" 
-                                   min="0" 
-                                   step="1000"
-                                   placeholder="350000">
+                            <input type="number" id="price" name="price" min="0" step="1000" 
+                                   placeholder="0">
                             <span class="price-suffix">per orang</span>
                         </div>
-                        <small class="form-help">
-                            Masukkan harga tanpa titik atau koma. Contoh: 350000 untuk Rp 350.000
-                            <br>Kosongkan jika harga akan ditentukan setelah konsultasi
-                        </small>
+                        <small class="form-help">Kosongkan jika harga akan ditentukan kemudian</small>
                     </div>
                 </div>
 
                 <!-- Upload Foto -->
                 <div class="form-section">
                     <h3 class="subsection-title">
-                        <i class="fas fa-camera"></i> Foto-foto Paket Wisata
+                        <i class="fas fa-camera"></i> Upload Foto Paket
                     </h3>
                     
-                    <div class="form-group">
-                        <label for="fotos">
-                            <i class="fas fa-cloud-upload-alt"></i> Upload Foto Wisata
-                            <span class="required">*</span>
-                        </label>
-                        <div class="file-upload-area" id="file-upload-area">
-                            <input type="file" 
-                                   id="fotos" 
-                                   name="fotos[]" 
-                                   multiple 
-                                   accept="image/*" 
-                                   required>
-                            <div class="upload-content">
-                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                                <h4>Klik atau Seret Foto ke Sini</h4>
-                                <p>Upload 3-6 foto terbaik dari destinasi wisata</p>
-                                <div class="upload-requirements">
-                                    <span class="req-item"><i class="fas fa-check"></i> Format: JPG, PNG</span>
-                                    <span class="req-item"><i class="fas fa-check"></i> Ukuran maksimal: 5MB per foto</span>
-                                    <span class="req-item"><i class="fas fa-check"></i> Minimal 3 foto, maksimal 6 foto</span>
+                    <div class="file-upload-area">
+                        <input type="file" name="fotos[]" multiple accept="image/*" required>
+                        <div class="upload-content">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h4>Drag & Drop Foto atau Klik untuk Pilih</h4>
+                            <p>Upload 3-6 foto untuk paket ini</p>
+                            <div class="upload-requirements">
+                                <div class="req-item">
+                                    <i class="fas fa-check"></i> Format: JPG, JPEG, PNG
+                                </div>
+                                <div class="req-item">
+                                    <i class="fas fa-check"></i> Ukuran maksimal: 5MB per foto
+                                </div>
+                                <div class="req-item">
+                                    <i class="fas fa-check"></i> Minimal 3 foto, maksimal 6 foto
                                 </div>
                             </div>
                         </div>
-                        <div id="photo-preview" class="photo-preview"></div>
-                        <small class="form-help">
-                            Tips: Gunakan foto berkualitas tinggi yang menunjukkan keindahan destinasi. 
-                            Foto pertama akan menjadi gambar utama.
-                        </small>
                     </div>
                 </div>
 
                 <!-- Jadwal Perjalanan -->
                 <div class="form-section">
                     <h3 class="subsection-title">
-                        <i class="fas fa-map-marked-alt"></i> Jadwal Perjalanan (Itinerary)
+                        <i class="fas fa-calendar-alt"></i> Jadwal Perjalanan (Itinerary)
                     </h3>
-                    <p class="section-description">
-                        Buat jadwal harian untuk paket wisata. Anda bisa menambah atau mengurangi hari sesuai kebutuhan.
-                    </p>
                     
                     <div class="itinerary-builder">
                         <div class="itinerary-controls">
@@ -1347,18 +225,14 @@ if (isset($_GET['hapus'])) {
                                 <i class="fas fa-plus"></i> Tambah Hari
                             </button>
                             <button type="button" class="btn-reset" onclick="resetItinerary()">
-                                <i class="fas fa-refresh"></i> Reset Semua
+                                <i class="fas fa-redo"></i> Reset
                             </button>
-                            <div class="day-counter">
-                                Total: <span id="day-count">0</span> hari
-                            </div>
+                            <div class="day-counter">0 Hari</div>
                         </div>
                         
-                        <div id="itinerary-days" class="itinerary-days">
-                            <!-- Hari akan ditambahkan secara dinamis -->
+                        <div class="itinerary-days" id="itinerary-days">
+                            <!-- Days will be added dynamically -->
                         </div>
-                        
-                        <input type="hidden" id="itinerary" name="itinerary">
                     </div>
                 </div>
 
@@ -1370,12 +244,10 @@ if (isset($_GET['hapus'])) {
                     
                     <div class="form-group">
                         <label for="highlights">
-                            <i class="fas fa-heart"></i> Highlight Wisata
+                            <i class="fas fa-bullhorn"></i> Highlight Paket
                         </label>
-                        <textarea id="highlights" 
-                                  name="highlights" 
-                                  rows="4" 
-                                  placeholder="Tuliskan daya tarik utama paket ini, pisahkan dengan tanda | (garis tegak)
+                        <textarea id="highlights" name="highlights" rows="4" 
+                                  placeholder="Tuliskan daya tarik utama paket ini, pisahkan dengan tanda |
 
 Contoh:
 Candi Borobudur - Warisan Dunia UNESCO | Keraton Yogyakarta - Istana Sultan yang masih aktif | Malioboro Street - Jantung kota Yogyakarta | Kuliner Khas Jogja - Gudeg dan jajanan tradisional"></textarea>
@@ -1395,13 +267,13 @@ Candi Borobudur - Warisan Dunia UNESCO | Keraton Yogyakarta - Istana Sultan yang
                     <div class="form-grid-two">
                         <div class="form-group">
                             <label for="inclusions">
-                                <i class="fas fa-check-circle" style="color: #27ae60;"></i> 
-                                Yang Sudah Termasuk dalam Paket
+                                <i class="fas fa-check-circle" style="color: #28a745;"></i> 
+                                Yang Termasuk
                             </label>
                             <textarea id="inclusions" 
                                       name="inclusions" 
                                       rows="6" 
-                                      placeholder="Tuliskan apa saja yang sudah termasuk, pisahkan dengan tanda |
+                                      placeholder="Tuliskan apa yang termasuk dalam paket, pisahkan dengan tanda |
 
 Contoh:
 Hotel bintang 3 selama 1 malam | Transportasi mobil ber-AC | Tiket masuk semua tempat wisata | Pemandu wisata berpengalaman | Makan siang 2x | Sarapan 1x | Air mineral selama perjalanan | Asuransi perjalanan"></textarea>
@@ -1437,6 +309,7 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
             </form>
         </div>
 
+        <!-- Daftar Paket -->
         <div class="admin-section">
             <h2 class="section-title">
                 <i class="fas fa-list"></i> Daftar Paket Wisata
@@ -1451,48 +324,64 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
             ?>
             <div class="packages-grid">
                 <?php while ($row = $result->fetch_assoc()): ?>
-                    <div class="package-card">
-                        <div class="package-image">
-                            <?php 
-                            $fotosArray = json_decode($row['fotos'], true);
-                            if ($fotosArray && is_array($fotosArray) && count($fotosArray) > 0):
-                                $firstPhoto = $fotosArray[0];
-                                $photoPath = "uploads/" . $firstPhoto;
-                                if (file_exists($photoPath)):
-                            ?>
-                                <img src="<?= $photoPath ?>" alt="<?= htmlspecialchars($row['nama']) ?>">
-                                <div class="photo-badge"><?= count($fotosArray) ?> Foto</div>
-                            <?php else: ?>
-                                <div class="no-image-placeholder">
-                                    <i class="fas fa-image"></i>
-                                    <p>Foto tidak tersedia</p>
-                                </div>
-                            <?php endif; ?>
-                            <?php else: ?>
-                                <div class="no-image-placeholder">
-                                    <i class="fas fa-image"></i>
-                                    <p>Foto tidak tersedia</p>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <div class="package-content">
-                            <h3 class="package-title"><?= htmlspecialchars($row['nama']) ?></h3>
-                            <p class="package-description">
-                                <?= htmlspecialchars(strlen($row['deskripsi']) > 150 ? substr($row['deskripsi'], 0, 150) . '...' : $row['deskripsi']) ?>
-                            </p>
-                            
-                            <div class="package-actions">
-                                <a href="../FrontEnd/html/package_detail.html?id=<?= $row['id'] ?>" class="view-btn">
-                                    <i class="fas fa-eye"></i> Lihat
-                                </a>
-                                <a href="admin.php?hapus=<?= $row['id'] ?>" class="delete-btn" 
-                                   onclick="return confirm('Yakin ingin menghapus paket ini?')">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+<div class="package-card">
+    <div class="package-image">
+        <?php
+        $fotosArray = json_decode($row['fotos'], true);
+        $firstPhoto = '';
+        $photoCount = 0;
+        
+        if (is_array($fotosArray) && !empty($fotosArray)) {
+            $photoCount = count($fotosArray);
+            foreach ($fotosArray as $foto) {
+                if (!empty($foto)) {
+                    $fotoPath = "uploads/" . htmlspecialchars($foto);
+                    if (file_exists($fotoPath)) {
+                        $firstPhoto = $fotoPath;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (empty($firstPhoto)) {
+            $firstPhoto = "../Asset/Package_Culture/borobudur.jpg";
+        }
+        ?>
+        
+        <img src="<?= $firstPhoto ?>" 
+             alt="<?= htmlspecialchars($row['nama']) ?>"
+             onerror="this.src='../Asset/Package_Culture/borobudur.jpg'">
+        
+        <div class="photo-badge">
+            <i class="fas fa-images"></i> <?= $photoCount ?> Foto
+        </div>
+    </div>
+    
+    <div class="package-content">
+        <h3 class="package-title"><?= htmlspecialchars($row['nama']) ?></h3>
+        <p class="package-description">
+            <?= htmlspecialchars(substr($row['deskripsi'], 0, 100)) ?>...
+        </p>
+        
+        <div class="package-actions">
+            <a href="../FrontEnd/html/package_detail.html?id=<?= $row['id'] ?>" 
+               class="view-btn" target="_blank">
+                <i class="fas fa-eye"></i> Lihat
+            </a>
+            <button type="button" 
+                    onclick="openGalleryManage(<?= $row['id'] ?>, '<?= htmlspecialchars($row['nama'], ENT_QUOTES) ?>')" 
+                    class="btn-gallery">
+                <i class="fas fa-images"></i> Gallery
+            </button>
+            <a href="?hapus=<?= $row['id'] ?>" 
+               class="delete-btn" 
+               onclick="return confirm('Yakin ingin menghapus paket ini?')">
+                <i class="fas fa-trash"></i> Hapus
+            </a>
+        </div>
+    </div>
+</div>
                 <?php endwhile; ?>
             </div>
             <?php else: ?>
@@ -1502,425 +391,683 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
                 <p>Mulai dengan menambahkan paket wisata pertama Anda.</p>
             </div>
             <?php endif; 
-
             $stmt->close();
             ?>
         </div>
+    </div>
 
-        <script>
-            // Enhanced JavaScript untuk form yang lebih user-friendly
-let dayCounter = 0;
-let itineraryData = {};
-let uploadedFiles = [];
+    <!-- Gallery Management Modal -->
+    <div id="galleryManageModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-images"></i> Kelola Gallery: <span id="galleryPackageName"></span></h3>
+                <span class="close" onclick="closeGalleryModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Upload New Photos Section -->
+                <div class="gallery-section">
+                    <h4><i class="fas fa-plus"></i> Tambah Foto Baru</h4>
+                    <form id="galleryUploadForm" enctype="multipart/form-data">
+                        <input type="hidden" id="galleryPackageId" name="package_id">
+                        
+                        <div class="form-group">
+                            <label for="galleryFiles">Pilih Foto untuk ditambahkan:</label>
+                            <input type="file" id="galleryFiles" name="photos[]" accept="image/*" multiple>
+                            <small>Maksimal 10 foto, ukuran maksimal 5MB per foto</small>
+                        </div>
+                        
+                        <div id="galleryCaptions" class="photo-captions"></div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-upload"></i> Upload Foto
+                        </button>
+                    </form>
+                </div>
+                
+                <hr style="margin: 30px 0;">
+                
+                <!-- Existing Photos Management -->
+                <div class="gallery-section">
+                    <h4><i class="fas fa-edit"></i> Foto yang Ada</h4>
+                    <div id="existingPhotos" class="existing-photos-grid">
+                        <!-- Photos will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// Time periods dalam Bahasa Indonesia
-const timePeriods = [
-    { value: 'Pagi', label: '🌅 Pagi (06:00 - 10:00)' },
-    { value: 'Siang', label: '☀️ Siang (10:00 - 14:00)' },
-    { value: 'Sore', label: '🌇 Sore (14:00 - 18:00)' },
-    { value: 'Malam', label: '🌙 Malam (18:00 - 22:00)' },
-    { value: '06:00', label: '06:00 - Subuh' },
-    { value: '07:00', label: '07:00 - Pagi' },
-    { value: '08:00', label: '08:00 - Pagi' },
-    { value: '09:00', label: '09:00 - Pagi' },
-    { value: '10:00', label: '10:00 - Pagi' },
-    { value: '11:00', label: '11:00 - Siang' },
-    { value: '12:00', label: '12:00 - Siang' },
-    { value: '13:00', label: '13:00 - Siang' },
-    { value: '14:00', label: '14:00 - Sore' },
-    { value: '15:00', label: '15:00 - Sore' },
-    { value: '16:00', label: '16:00 - Sore' },
-    { value: '17:00', label: '17:00 - Sore' },
-    { value: '18:00', label: '18:00 - Malam' },
-    { value: '19:00', label: '19:00 - Malam' },
-    { value: '20:00', label: '20:00 - Malam' },
-    { value: 'Sarapan', label: '🍳 Sarapan' },
-    { value: 'Makan Siang', label: '🍽️ Makan Siang' },
-    { value: 'Makan Malam', label: '🍽️ Makan Malam' },
-    { value: 'Check-in', label: '🏨 Check-in Hotel' },
-    { value: 'Check-out', label: '🏨 Check-out Hotel' }
-];
+    <script src="admin-gallery.js"></script>
+    <script>
+// Gallery management functions - Fixed version
+let galleryManager = {
+    currentPackageId: null,
+    currentPackageName: '',
+    
+    openGalleryManage: function(packageId, packageName) {
+        this.currentPackageId = packageId;
+        this.currentPackageName = packageName;
+        
+        // Set modal content
+        document.getElementById('galleryPackageId').value = packageId;
+        document.getElementById('galleryPackageName').textContent = packageName;
+        
+        // Load existing photos
+        this.loadExistingPhotos(packageId);
+        
+        // Show modal
+        document.getElementById('galleryManageModal').style.display = 'block';
+    },
+    
+    closeGalleryModal: function() {
+        document.getElementById('galleryManageModal').style.display = 'none';
+        this.currentPackageId = null;
+        this.currentPackageName = '';
+        
+        // Clear file input
+        document.getElementById('galleryFiles').value = '';
+        document.getElementById('galleryCaptions').innerHTML = '';
+    },
+    
+    loadExistingPhotos: function(packageId) {
+        const container = document.getElementById('existingPhotos');
+        container.innerHTML = '<p class="loading">Loading photos...</p>';
+        
+        fetch(`get_gallery_photos.php?package_id=${encodeURIComponent(packageId)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text(); // Get as text first for debugging
+            })
+            .then(text => {
+                console.log('Raw response:', text); // Debug log
+                
+                // Try to parse JSON
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Invalid JSON response: ' + text);
+                }
+                
+                console.log('Parsed data:', data, 'Type:', typeof data, 'Is array:', Array.isArray(data)); // Debug log
+                
+                // Handle error response
+                if (data && data.error) {
+                    container.innerHTML = `<p class="error">Error loading photos: ${data.error}</p>`;
+                    return;
+                }
+                
+                // Ensure we have an array
+                if (!Array.isArray(data)) {
+                    console.error('Expected array, got:', typeof data, data);
+                    
+                    // If it's an object with photos property, use that
+                    if (data && typeof data === 'object' && Array.isArray(data.photos)) {
+                        data = data.photos;
+                    } else {
+                        container.innerHTML = '<p class="error">Invalid data format received</p>';
+                        return;
+                    }
+                }
+                
+                // Handle empty array
+                if (data.length === 0) {
+                    container.innerHTML = '<p class="no-photos">Belum ada foto gallery untuk paket ini.</p>';
+                    return;
+                }
+                
+                // Render photos
+                container.innerHTML = data.map(photo => {
+                    // Ensure all required properties exist
+                    const id = photo.id || 0;
+                    const filename = photo.photo_filename || '';
+                    const caption = photo.caption || '';
+                    const order = photo.photo_order || 0;
+                    
+                    return `
+                        <div class="photo-item" data-photo-id="${id}">
+                            <div class="photo-wrapper">
+                                <img src="uploads/gallery/${filename}" 
+                                     alt="${caption}"
+                                     onerror="this.src='../Asset/Package_Culture/borobudur.jpg'">
+                                <div class="photo-overlay">
+                                    <button class="btn-edit-caption" onclick="galleryManager.editCaption(${id}, '${caption.replace(/'/g, '\\\'')}')" title="Edit Caption">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-move-up" onclick="galleryManager.movePhoto(${id}, 'up')" title="Move Up">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                    <button class="btn-move-down" onclick="galleryManager.movePhoto(${id}, 'down')" title="Move Down">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                    <button class="btn-delete-photo" onclick="galleryManager.deletePhoto(${id})" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="photo-caption">
+                                <span class="caption-text">${caption || 'No caption'}</span>
+                                <span class="photo-order">Order: ${order}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            })
+            .catch(error => {
+                console.error('Error loading photos:', error);
+                container.innerHTML = `<p class="error">Error loading photos: ${error.message}</p>`;
+            });
+    },
+    
+    editCaption: function(photoId, currentCaption) {
+        const newCaption = prompt('Edit caption:', currentCaption);
+        if (newCaption !== null && newCaption !== currentCaption) {
+            fetch('update_photo_caption.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    photo_id: photoId,
+                    caption: newCaption
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.loadExistingPhotos(this.currentPackageId);
+                } else {
+                    alert('Error updating caption: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error updating caption:', error);
+                alert('Error updating caption');
+            });
+        }
+    },
+    
+    movePhoto: function(photoId, direction) {
+        fetch('move_photo_order.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                photo_id: photoId,
+                direction: direction
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                this.loadExistingPhotos(this.currentPackageId);
+            } else {
+                alert('Error moving photo: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error moving photo:', error);
+            alert('Error moving photo');
+        });
+    },
+    
+    deletePhoto: function(photoId) {
+        if (confirm('Are you sure you want to delete this photo?')) {
+            fetch('delete_gallery_photo.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    photo_id: photoId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.loadExistingPhotos(this.currentPackageId);
+                } else {
+                    alert('Error deleting photo: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting photo:', error);
+                alert('Error deleting photo');
+            });
+        }
+    }
+};
 
-// Initialize form
+// Gallery upload form handler
 document.addEventListener('DOMContentLoaded', function() {
-    initializeForm();
-    setupFileUpload();
-    updateItineraryDays();
-});
-
-function initializeForm() {
-    // Character counter untuk deskripsi
-    const descTextarea = document.getElementById('deskripsi');
-    const descCounter = document.getElementById('desc-counter');
+    const galleryUploadForm = document.getElementById('galleryUploadForm');
+    const galleryFiles = document.getElementById('galleryFiles');
+    const galleryCaptions = document.getElementById('galleryCaptions');
     
-    descTextarea.addEventListener('input', function() {
-        const currentLength = this.value.length;
-        descCounter.textContent = currentLength;
+    // Handle file selection for captions
+    galleryFiles.addEventListener('change', function() {
+        const files = this.files;
+        galleryCaptions.innerHTML = '';
         
-        if (currentLength > 800) {
-            descCounter.style.color = '#e74c3c';
-        } else if (currentLength > 600) {
-            descCounter.style.color = '#f39c12';
-        } else {
-            descCounter.style.color = '#3498db';
+        for (let i = 0; i < files.length; i++) {
+            const captionDiv = document.createElement('div');
+            captionDiv.className = 'caption-input-group';
+            captionDiv.innerHTML = `
+                <label>Caption for ${files[i].name}:</label>
+                <input type="text" name="captions[]" placeholder="Enter caption for this photo">
+            `;
+            galleryCaptions.appendChild(captionDiv);
         }
     });
-
-    // Format harga otomatis
-    const priceInput = document.getElementById('price');
-    priceInput.addEventListener('input', function() {
-        // Remove non-numeric characters
-        let value = this.value.replace(/[^\d]/g, '');
+    
+    // Handle gallery upload form submission
+    galleryUploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        // Add thousands separator for display
-        if (value) {
-            const formatted = parseInt(value).toLocaleString('id-ID');
-            // Don't change the actual input value, just show formatted in placeholder
-        }
-    });
-}
-
-function setupFileUpload() {
-    const fileInput = document.getElementById('fotos');
-    const uploadArea = document.getElementById('file-upload-area');
-    const preview = document.getElementById('photo-preview');
-    
-    // Drag and drop
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        this.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        this.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.classList.remove('dragover');
+        const formData = new FormData(this);
+        const files = galleryFiles.files;
         
-        const files = e.dataTransfer.files;
-        handleFiles(files);
-    });
-    
-    // File input change
-    fileInput.addEventListener('change', function(e) {
-        handleFiles(this.files);
-    });
-    
-    function handleFiles(files) {
-        if (files.length < 3 || files.length > 6) {
-            alert('Silakan pilih 3-6 foto');
+        if (files.length === 0) {
+            alert('Please select at least one photo to upload');
             return;
         }
         
-        preview.innerHTML = '';
-        uploadedFiles = [];
+        if (files.length > 10) {
+            alert('Maximum 10 photos allowed');
+            return;
+        }
         
-        Array.from(files).forEach((file, index) => {
-            if (!file.type.startsWith('image/')) {
-                alert(`File ${file.name} bukan foto yang valid`);
+        // Check file sizes
+        for (let file of files) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB
+                alert(`File ${file.name} is too large. Maximum size is 5MB`);
                 return;
             }
-            
-            if (file.size > 5 * 1024 * 1024) {
-                alert(`Foto ${file.name} terlalu besar (maksimal 5MB)`);
-                return;
+        }
+        
+        fetch('upload_additional_photos.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Photos uploaded successfully!');
+                galleryFiles.value = '';
+                galleryCaptions.innerHTML = '';
+                galleryManager.loadExistingPhotos(galleryManager.currentPackageId);
+            } else {
+                alert('Error uploading photos: ' + (data.error || 'Unknown error'));
             }
-            
-            uploadedFiles.push(file);
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const photoItem = document.createElement('div');
-                photoItem.className = 'photo-item';
-                photoItem.innerHTML = `
-                    <img src="${e.target.result}" alt="Foto ${index + 1}">
-                    <button type="button" class="photo-remove" onclick="removePhoto(${index})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="photo-info">
-                        ${index === 0 ? 'Foto Utama' : `Foto ${index + 1}`}
-                        <br><small>${(file.size / 1024).toFixed(1)} KB</small>
-                    </div>
-                `;
-                preview.appendChild(photoItem);
-            };
-            reader.readAsDataURL(file);
+        })
+        .catch(error => {
+            console.error('Error uploading photos:', error);
+            alert('Error uploading photos');
         });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('galleryManageModal');
+        if (event.target === modal) {
+            galleryManager.closeGalleryModal();
+        }
+    });
+});
+
+// Make galleryManager available globally
+window.galleryManager = galleryManager;
+
+// Fix the global functions to use galleryManager
+function openGalleryManage(packageId, packageName) {
+    galleryManager.openGalleryManage(packageId, packageName);
+}
+
+function closeGalleryModal() {
+    galleryManager.closeGalleryModal();
+}
+
+// Itinerary Management Functions
+let dayCount = 0;
+
+function updateItineraryDays() {
+    const durationSelect = document.getElementById('duration');
+    const selectedDuration = durationSelect.value;
+    
+    // Extract number of days from duration (e.g., "2D1N" -> 2)
+    const days = parseInt(selectedDuration.match(/(\d+)D/)?.[1] || 2);
+    
+    // Reset and rebuild itinerary
+    const container = document.getElementById('itinerary-days');
+    container.innerHTML = '';
+    dayCount = 0;
+    
+    // Add days based on selected duration
+    for (let i = 0; i < days; i++) {
+        addItineraryDay();
+    }
+    
+    updateDayCounter();
+}
+
+function addItineraryDay() {
+    dayCount++;
+    const container = document.getElementById('itinerary-days');
+    
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'day-itinerary';
+    dayDiv.id = `day-${dayCount}`;
+    
+    dayDiv.innerHTML = `
+        <div class="day-header" onclick="toggleDayContent(${dayCount})">
+            <span>Hari ${dayCount}</span>
+        </div>
+        <div class="day-content" id="day-content-${dayCount}">
+            <div class="form-group">
+                <label for="day-title-${dayCount}">Judul Hari ${dayCount}</label>
+                <input type="text" 
+                       id="day-title-${dayCount}" 
+                       name="day_titles[]" 
+                       placeholder="Contoh: Hari 1 - Tiba di Yogyakarta"
+                       value="Hari ${dayCount}">
+            </div>
+            
+            <div class="activities-container" id="activities-${dayCount}">
+                <label>Aktivitas Hari ${dayCount}</label>
+                <div class="activity-item">
+                    <div class="form-grid-two">
+                        <input type="time" name="day_${dayCount}_times[]" placeholder="Waktu">
+                        <input type="text" name="day_${dayCount}_activities[]" placeholder="Deskripsi aktivitas">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="activity-controls">
+                <button type="button" class="btn-add-activity" onclick="addActivity(${dayCount})">
+                    <i class="fas fa-plus"></i> Tambah Aktivitas
+                </button>
+                <button type="button" class="btn-remove-day" onclick="removeDay(${dayCount})">
+                    <i class="fas fa-trash"></i> Hapus Hari
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(dayDiv);
+    updateDayCounter();
+    
+    // Expand the newly added day
+    setTimeout(() => {
+        toggleDayContent(dayCount, true);
+    }, 100);
+}
+
+function toggleDayContent(dayNum, forceOpen = false) {
+    const header = document.querySelector(`#day-${dayNum} .day-header`);
+    const content = document.getElementById(`day-content-${dayNum}`);
+    
+    if (!header || !content) return;
+    
+    if (forceOpen || !content.classList.contains('expanded')) {
+        // Close all other days
+        document.querySelectorAll('.day-content').forEach(dayContent => {
+            if (dayContent.id !== `day-content-${dayNum}`) {
+                dayContent.classList.remove('expanded');
+                dayContent.parentElement.querySelector('.day-header').classList.remove('active');
+            }
+        });
+        
+        // Open this day
+        header.classList.add('active');
+        content.classList.add('expanded');
+    } else {
+        // Close this day
+        header.classList.remove('active');
+        content.classList.remove('expanded');
     }
 }
 
-function removePhoto(index) {
-    uploadedFiles.splice(index, 1);
+function addActivity(dayNum) {
+    const container = document.getElementById(`activities-${dayNum}`);
+    const activityDiv = document.createElement('div');
+    activityDiv.className = 'activity-item';
     
-    // Update file input
-    const dataTransfer = new DataTransfer();
-    uploadedFiles.forEach(file => dataTransfer.items.add(file));
-    document.getElementById('fotos').files = dataTransfer.files;
+    activityDiv.innerHTML = `
+        <div class="form-grid-two">
+            <input type="time" name="day_${dayNum}_times[]" placeholder="Waktu">
+            <input type="text" name="day_${dayNum}_activities[]" placeholder="Deskripsi aktivitas">
+        </div>
+        <button type="button" class="btn-remove-activity" onclick="removeActivity(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
     
-    // Refresh preview
-    const event = new Event('change');
-    document.getElementById('fotos').dispatchEvent(event);
+    container.appendChild(activityDiv);
 }
 
-function updateItineraryDays() {
-    const duration = document.getElementById('duration').value;
-    
-    if (duration === 'custom') {
-        const customDays = prompt('Berapa hari durasi paket wisata ini?', '3');
-        if (customDays && !isNaN(customDays) && customDays > 0) {
-            initializeItinerary(parseInt(customDays));
-        }
+function removeActivity(button) {
+    button.parentElement.remove();
+}
+
+function removeDay(dayNum) {
+    if (dayCount <= 1) {
+        alert('Minimal harus ada 1 hari dalam itinerary');
         return;
     }
     
-    const days = parseInt(duration.match(/\d+/)?.[0] || 2);
-    initializeItinerary(days);
-}
-
-function initializeItinerary(days) {
-    resetItinerary();
-    
-    for (let i = 1; i <= days; i++) {
-        addItineraryDay(i);
-    }
-    
-    updateDayCounter();
-}
-
-function addItineraryDay(dayNumber = null) {
-    dayCounter++;
-    if (!dayNumber) dayNumber = dayCounter;
-    
-    const dayId = `day-${dayNumber}`;
-    itineraryData[dayId] = {
-        title: `Hari ${dayNumber}`,
-        activities: [
-            { time: 'Pagi', description: '' }
-        ]
-    };
-    
-    const dayCard = createDayCard(dayId, dayNumber);
-    document.getElementById('itinerary-days').appendChild(dayCard);
-    
-    updateDayCounter();
-    saveItineraryData();
-}
-
-function createDayCard(dayId, dayNumber) {
-    const dayCard = document.createElement('div');
-    dayCard.className = 'day-card';
-    dayCard.setAttribute('data-day-id', dayId);
-    
-    dayCard.innerHTML = `
-        <div class="day-card-header">
-            <div class="day-title">Hari ${dayNumber}</div>
-            <button type="button" class="btn-remove-day" onclick="removeDayCard('${dayId}')" 
-                    ${dayNumber <= 1 ? 'style="display: none;"' : ''}>
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="day-content">
-            <div class="activities-list" id="${dayId}-activities">
-                ${createActivityHTML(dayId, 0)}
-            </div>
-            <div class="add-activity-btn" onclick="addActivityToDay('${dayId}')">
-                <i class="fas fa-plus"></i> Tambah Aktivitas
-            </div>
-        </div>
-    `;
-    
-    return dayCard;
-}
-
-function createActivityHTML(dayId, activityIndex) {
-    const activity = itineraryData[dayId].activities[activityIndex];
-    
-    return `
-        <div class="activity-item" data-activity-index="${activityIndex}">
-            <div class="time-input">
-                <select onchange="updateActivityTime('${dayId}', ${activityIndex}, this.value)">
-                    ${timePeriods.map(period => 
-                        `<option value="${period.value}" ${activity.time === period.value ? 'selected' : ''}>${period.label}</option>`
-                    ).join('')}
-                </select>
-            </div>
-            <div class="activity-input">
-                <input type="text" 
-                       placeholder="Jelaskan aktivitas. Contoh: Kunjungi Candi Borobudur dan nikmati sunrise yang memukau" 
-                       value="${activity.description}"
-                       onchange="updateActivityDescription('${dayId}', ${activityIndex}, this.value)">
-            </div>
-            <div class="activity-actions">
-                <button type="button" class="btn-activity btn-add-activity" 
-                        onclick="addActivityToDay('${dayId}', ${activityIndex + 1})" 
-                        title="Tambah aktivitas">
-                    <i class="fas fa-plus"></i>
-                </button>
-                ${itineraryData[dayId].activities.length > 1 ? `
-                    <button type="button" class="btn-activity btn-remove-activity" 
-                            onclick="removeActivity('${dayId}', ${activityIndex})" 
-                            title="Hapus aktivitas">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                ` : ''}
-            </div>
-        </div>
-    `;
-}
-
-// Fungsi-fungsi lainnya tetap sama, tapi dengan pesan Bahasa Indonesia
-function addActivityToDay(dayId, insertIndex = null) {
-    if (insertIndex === null) {
-        insertIndex = itineraryData[dayId].activities.length;
-    }
-    
-    itineraryData[dayId].activities.splice(insertIndex, 0, {
-        time: 'Pagi',
-        description: ''
-    });
-    
-    refreshDayActivities(dayId);
-    saveItineraryData();
-}
-
-function removeActivity(dayId, activityIndex) {
-    if (itineraryData[dayId].activities.length > 1) {
-        itineraryData[dayId].activities.splice(activityIndex, 1);
-        refreshDayActivities(dayId);
-        saveItineraryData();
-    } else {
-        alert('Setiap hari harus memiliki minimal 1 aktivitas');
-    }
-}
-
-function removeDayCard(dayId) {
-    if (confirm('Hapus hari ini beserta semua aktivitasnya?')) {
-        delete itineraryData[dayId];
-        document.querySelector(`[data-day-id="${dayId}"]`).remove();
+    if (confirm(`Hapus Hari ${dayNum}?`)) {
+        document.getElementById(`day-${dayNum}`).remove();
+        dayCount--;
         updateDayCounter();
-        saveItineraryData();
+        renumberDays();
     }
 }
 
-function refreshDayActivities(dayId) {
-    const activitiesContainer = document.getElementById(`${dayId}-activities`);
-    activitiesContainer.innerHTML = '';
-    
-    itineraryData[dayId].activities.forEach((_, index) => {
-        activitiesContainer.innerHTML += createActivityHTML(dayId, index);
+function renumberDays() {
+    const days = document.querySelectorAll('.day-itinerary');
+    days.forEach((day, index) => {
+        const newDayNum = index + 1;
+        const oldId = day.id;
+        
+        // Update day container
+        day.id = `day-${newDayNum}`;
+        
+        // Update header
+        const header = day.querySelector('.day-header span');
+        if (header) header.textContent = `Hari ${newDayNum}`;
+        
+        // Update header onclick
+        const headerDiv = day.querySelector('.day-header');
+        if (headerDiv) headerDiv.setAttribute('onclick', `toggleDayContent(${newDayNum})`);
+        
+        // Update content id
+        const content = day.querySelector('.day-content');
+        if (content) content.id = `day-content-${newDayNum}`;
+        
+        // Update form elements
+        updateDayFormElements(day, newDayNum);
     });
+    
+    dayCount = days.length;
 }
 
-function updateActivityTime(dayId, activityIndex, time) {
-    itineraryData[dayId].activities[activityIndex].time = time;
-    saveItineraryData();
-}
-
-function updateActivityDescription(dayId, activityIndex, description) {
-    itineraryData[dayId].activities[activityIndex].description = description;
-    saveItineraryData();
+function updateDayFormElements(dayElement, dayNum) {
+    // Update day title
+    const titleInput = dayElement.querySelector('input[name="day_titles[]"]');
+    if (titleInput) {
+        titleInput.id = `day-title-${dayNum}`;
+        titleInput.placeholder = `Contoh: Hari ${dayNum} - Tiba di Yogyakarta`;
+        if (titleInput.value.startsWith('Hari ')) {
+            titleInput.value = `Hari ${dayNum}`;
+        }
+    }
+    
+    // Update activities container
+    const activitiesContainer = dayElement.querySelector('.activities-container');
+    if (activitiesContainer) {
+        activitiesContainer.id = `activities-${dayNum}`;
+        
+        const label = activitiesContainer.querySelector('label');
+        if (label) label.textContent = `Aktivitas Hari ${dayNum}`;
+    }
+    
+    // Update time and activity inputs
+    const timeInputs = dayElement.querySelectorAll('input[type="time"]');
+    const activityInputs = dayElement.querySelectorAll('input[type="text"]:not([name="day_titles[]"])');
+    
+    timeInputs.forEach(input => {
+        input.name = `day_${dayNum}_times[]`;
+    });
+    
+    activityInputs.forEach(input => {
+        if (input.name.includes('_activities[]')) {
+            input.name = `day_${dayNum}_activities[]`;
+        }
+    });
+    
+    // Update button onclick
+    const addActivityBtn = dayElement.querySelector('.btn-add-activity');
+    if (addActivityBtn) {
+        addActivityBtn.setAttribute('onclick', `addActivity(${dayNum})`);
+    }
+    
+    const removeDayBtn = dayElement.querySelector('.btn-remove-day');
+    if (removeDayBtn) {
+        removeDayBtn.setAttribute('onclick', `removeDay(${dayNum})`);
+    }
 }
 
 function resetItinerary() {
-    if (Object.keys(itineraryData).length > 0) {
-        if (!confirm('Hapus semua jadwal yang sudah dibuat?')) {
-            return;
-        }
+    if (confirm('Reset semua itinerary? Data yang sudah diisi akan hilang.')) {
+        const container = document.getElementById('itinerary-days');
+        container.innerHTML = '';
+        dayCount = 0;
+        
+        // Add one default day
+        addItineraryDay();
+        updateDayCounter();
     }
-    
-    dayCounter = 0;
-    itineraryData = {};
-    document.getElementById('itinerary-days').innerHTML = '';
-    updateDayCounter();
 }
 
 function updateDayCounter() {
-    const dayCount = Object.keys(itineraryData).length;
-    document.getElementById('day-count').textContent = dayCount;
+    const counter = document.querySelector('.day-counter');
+    if (counter) {
+        counter.textContent = `${dayCount} Hari`;
+    }
 }
 
-function saveItineraryData() {
-    const formattedData = {};
+// Form submission handler
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize with default duration
+    updateItineraryDays();
     
-    Object.keys(itineraryData).forEach(dayId => {
-        const day = itineraryData[dayId];
-        formattedData[dayId] = {
-            title: day.title,
-            activities: day.activities.map(activity => ({
-                time: activity.time,
-                description: activity.description
-            }))
-        };
+    // Handle form submission to collect itinerary data
+    const form = document.querySelector('.admin-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const itineraryData = collectItineraryData();
+            
+            // Add itinerary data to form
+            const itineraryInput = document.createElement('input');
+            itineraryInput.type = 'hidden';
+            itineraryInput.name = 'itinerary';
+            itineraryInput.value = JSON.stringify(itineraryData);
+            
+            form.appendChild(itineraryInput);
+        });
+    }
+});
+
+function collectItineraryData() {
+    const itineraryData = {};
+    
+    document.querySelectorAll('.day-itinerary').forEach((dayElement, index) => {
+        const dayNum = index + 1;
+        const dayId = `day_${dayNum}`;
+        
+        const titleInput = dayElement.querySelector('input[name="day_titles[]"]');
+        const timeInputs = dayElement.querySelectorAll(`input[name="day_${dayNum}_times[]"]`);
+        const activityInputs = dayElement.querySelectorAll(`input[name="day_${dayNum}_activities[]"]`);
+        
+        const activities = [];
+        for (let i = 0; i < Math.max(timeInputs.length, activityInputs.length); i++) {
+            const time = timeInputs[i]?.value || '';
+            const description = activityInputs[i]?.value || '';
+            
+            if (description.trim()) {
+                activities.push({
+                    time: time,
+                    description: description.trim()
+                });
+            }
+        }
+        
+        if (activities.length > 0) {
+            itineraryData[dayId] = {
+                title: titleInput?.value || `Hari ${dayNum}`,
+                activities: activities
+            };
+        }
     });
     
-    document.getElementById('itinerary').value = JSON.stringify(formattedData);
+    return itineraryData;
 }
 
+// Preview function
 function previewPackage() {
-    const formData = new FormData(document.querySelector('form'));
+    const formData = new FormData(document.querySelector('.admin-form'));
+    const itineraryData = collectItineraryData();
     
-    // Basic validation
-    if (!formData.get('nama')) {
-        alert('Nama paket wisata harus diisi');
-        document.getElementById('nama').focus();
-        return;
-    }
+    // Create preview window
+    const previewWindow = window.open('', 'preview', 'width=800,height=600,scrollbars=yes');
     
-    if (!formData.get('deskripsi')) {
-        alert('Deskripsi paket harus diisi');
-        document.getElementById('deskripsi').focus();
-        return;
-    }
-    
-    if (!formData.get('fotos[]') || formData.getAll('fotos[]').length < 3) {
-        alert('Minimal 3 foto harus diupload');
-        document.getElementById('fotos').focus();
-        return;
-    }
-    
-    // Show preview modal or new window
-    showPreviewModal(formData);
+    previewWindow.document.write(`
+        <html>
+        <head>
+            <title>Preview Paket</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                .preview-section { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+                .preview-title { color: #2c3e50; font-size: 1.5em; margin-bottom: 10px; }
+                .day-preview { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; }
+            </style>
+        </head>
+        <body>
+            <h1>Preview: ${formData.get('nama') || 'Paket Wisata'}</h1>
+            
+            <div class="preview-section">
+                <div class="preview-title">Deskripsi</div>
+                <p>${formData.get('deskripsi') || 'Tidak ada deskripsi'}</p>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-title">Detail Paket</div>
+                <p><strong>Durasi:</strong> ${formData.get('duration') || '2D1N'}</p>
+                <p><strong>Harga:</strong> Rp ${parseInt(formData.get('price') || 0).toLocaleString('id-ID')}</p>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-title">Itinerary</div>
+                ${Object.entries(itineraryData).map(([dayId, dayData]) => `
+                    <div class="day-preview">
+                        <h3>${dayData.title}</h3>
+                        <ul>
+                            ${dayData.activities.map(activity => `
+                                <li>${activity.time ? activity.time + ' - ' : ''}${activity.description}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <button onclick="window.close()">Tutup Preview</button>
+        </body>
+        </html>
+    `);
 }
-
-function showPreviewModal(formData) {
-    const nama = formData.get('nama');
-    const deskripsi = formData.get('deskripsi');
-    const duration = formData.get('duration');
-    const price = formData.get('price');
-    
-    const modal = document.createElement('div');
-    modal.className = 'preview-modal';
-    modal.innerHTML = `
-        <div class="preview-content">
-            <div class="preview-header">
-                <h2>Preview Paket Wisata</h2>
-                <button onclick="this.closest('.preview-modal').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="preview-body">
-                <h3>${nama}</h3>
-                <p><strong>Durasi:</strong> ${duration}</p>
-                <p><strong>Harga:</strong> ${price ? 'Rp ' + parseInt(price).toLocaleString('id-ID') : 'Hubungi untuk harga'}</p>
-                <p><strong>Deskripsi:</strong> ${deskripsi}</p>
-                <p><strong>Foto:</strong> ${formData.getAll('fotos[]').length} foto</p>
-            </div>
-            <div class="preview-footer">
-                <button onclick="this.closest('.preview-modal').remove()">Tutup</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-}
-        </script>
-    </div>
-
-    <?php
-    $koneksi->close();
-    ?>
+</script>
 </body>
 </html>

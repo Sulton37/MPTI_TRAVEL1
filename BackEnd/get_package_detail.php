@@ -58,7 +58,7 @@ try {
     
     $package = $result->fetch_assoc();
     
-    // Process photos dengan optimasi
+    // Process main photos dengan optimasi
     $processedFotos = [];
     $fotosArray = json_decode($package['fotos'], true);
     
@@ -71,11 +71,41 @@ try {
             if (!empty($foto)) {
                 $fotoPath = __DIR__ . '/uploads/' . $foto;
                 
-                // Quick file check
                 if (file_exists($fotoPath) && is_readable($fotoPath)) {
-                    $processedFotos[] = $baseUrl . $foto;
+                    $processedFotos[] = [
+                        'url' => $baseUrl . $foto,
+                        'caption' => 'Foto Paket',
+                        'type' => 'main'
+                    ];
                 }
             }
+        }
+    }
+    
+    // Get additional gallery photos
+    $galleryStmt = $koneksi->prepare("
+        SELECT photo_filename, photo_caption, photo_order 
+        FROM package_gallery 
+        WHERE package_id = ? 
+        ORDER BY photo_order ASC, uploaded_at ASC
+    ");
+    $galleryStmt->bind_param("i", $package_id);
+    $galleryStmt->execute();
+    $galleryResult = $galleryStmt->get_result();
+    
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $galleryBaseUrl = $protocol . '://' . $host . '/MPTI_TRAVEL/BackEnd/uploads/gallery/';
+    
+    while ($galleryPhoto = $galleryResult->fetch_assoc()) {
+        $galleryPath = __DIR__ . '/uploads/gallery/' . $galleryPhoto['photo_filename'];
+        
+        if (file_exists($galleryPath) && is_readable($galleryPath)) {
+            $processedFotos[] = [
+                'url' => $galleryBaseUrl . $galleryPhoto['photo_filename'],
+                'caption' => $galleryPhoto['photo_caption'] ?: 'Foto Gallery',
+                'type' => 'gallery'
+            ];
         }
     }
     
@@ -86,10 +116,10 @@ try {
         $baseUrl = $protocol . '://' . $host . '/MPTI_TRAVEL/Asset/Package_Culture/';
         
         $processedFotos = [
-            $baseUrl . 'borobudur.jpg',
-            $baseUrl . 'prambanan.jpg',
-            $baseUrl . 'keraton.jpg',
-            $baseUrl . 'tamansari.jpg'
+            ['url' => $baseUrl . 'borobudur.jpg', 'caption' => 'Candi Borobudur', 'type' => 'default'],
+            ['url' => $baseUrl . 'prambanan.jpg', 'caption' => 'Candi Prambanan', 'type' => 'default'],
+            ['url' => $baseUrl . 'keraton.jpg', 'caption' => 'Keraton Yogyakarta', 'type' => 'default'],
+            ['url' => $baseUrl . 'tamansari.jpg', 'caption' => 'Taman Sari', 'type' => 'default']
         ];
     }
     
@@ -99,13 +129,14 @@ try {
         'id' => (int)$package['id'],
         'nama' => trim($package['nama'] ?? ''),
         'deskripsi' => trim($package['deskripsi'] ?? ''),
-        'fotos' => $processedFotos,
+        'fotos' => $processedFotos, // Now includes both main and gallery photos
         'itinerary' => trim($package['itinerary'] ?? ''),
         'highlights' => trim($package['highlights'] ?? ''),
         'inclusions' => trim($package['inclusions'] ?? ''),
         'exclusions' => trim($package['exclusions'] ?? ''),
         'price' => $package['price'] ? (float)$package['price'] : null,
         'duration' => trim($package['duration'] ?? '2D1N'),
+        'total_photos' => count($processedFotos),
         'load_time' => round((microtime(true) - $startTime) * 1000, 2) . 'ms'
     ];
     
@@ -131,80 +162,3 @@ try {
 
 exit;
 ?>
-
--- Jalankan di phpMyAdmin
-USE paket_travel;
-
--- Check if columns exist before adding
-SET @sql = (SELECT IF(
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE table_name = 'paket' 
-     AND table_schema = 'paket_travel' 
-     AND column_name = 'itinerary') = 0,
-    'ALTER TABLE paket ADD COLUMN itinerary TEXT',
-    'SELECT "itinerary column already exists"'));
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
--- Add other columns similarly
-SET @sql = (SELECT IF(
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE table_name = 'paket' 
-     AND table_schema = 'paket_travel' 
-     AND column_name = 'highlights') = 0,
-    'ALTER TABLE paket ADD COLUMN highlights TEXT',
-    'SELECT "highlights column already exists"'));
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SET @sql = (SELECT IF(
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE table_name = 'paket' 
-     AND table_schema = 'paket_travel' 
-     AND column_name = 'inclusions') = 0,
-    'ALTER TABLE paket ADD COLUMN inclusions TEXT',
-    'SELECT "inclusions column already exists"'));
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SET @sql = (SELECT IF(
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE table_name = 'paket' 
-     AND table_schema = 'paket_travel' 
-     AND column_name = 'exclusions') = 0,
-    'ALTER TABLE paket ADD COLUMN exclusions TEXT',
-    'SELECT "exclusions column already exists"'));
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SET @sql = (SELECT IF(
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE table_name = 'paket' 
-     AND table_schema = 'paket_travel' 
-     AND column_name = 'price') = 0,
-    'ALTER TABLE paket ADD COLUMN price DECIMAL(10,2)',
-    'SELECT "price column already exists"'));
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SET @sql = (SELECT IF(
-    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-     WHERE table_name = 'paket' 
-     AND table_schema = 'paket_travel' 
-     AND column_name = 'duration') = 0,
-    'ALTER TABLE paket ADD COLUMN duration VARCHAR(50) DEFAULT "2D1N"',
-    'SELECT "duration column already exists"'));
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;

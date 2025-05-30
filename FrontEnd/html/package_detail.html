@@ -531,30 +531,93 @@
             const mainImage = document.getElementById('main-image');
             const thumbnailCarousel = document.getElementById('thumbnail-carousel');
             
-            if (mainImage && fotos && fotos.length > 0) {
-                mainImage.src = fotos[0];
-                mainImage.alt = 'Gallery Image';
+            if (!fotos || fotos.length === 0) {
+                // Use default photos
+                const defaultPhotos = [
+                    { url: '../../Asset/Package_Culture/borobudur.jpg', caption: 'Candi Borobudur', type: 'default' },
+                    { url: '../../Asset/Package_Culture/prambanan.jpg', caption: 'Candi Prambanan', type: 'default' },
+                    { url: '../../Asset/Package_Culture/keraton.jpg', caption: 'Keraton Yogyakarta', type: 'default' }
+                ];
+                fotos = defaultPhotos;
             }
             
-            if (thumbnailCarousel && fotos && fotos.length > 0) {
-                thumbnailCarousel.innerHTML = fotos.map((foto, index) => 
-                    `<img class="thumb ${index === 0 ? 'active' : ''}" 
-                          src="${foto}" 
-                          alt="Gallery Image ${index + 1}" 
-                          onclick="changeMainImage('${foto}', this)">`
-                ).join('');
+            // Set main image
+            if (mainImage && fotos.length > 0) {
+                mainImage.src = fotos[0].url;
+                mainImage.alt = fotos[0].caption;
+                
+                // Add caption display
+                let captionEl = document.getElementById('main-image-caption');
+                if (!captionEl) {
+                    captionEl = document.createElement('div');
+                    captionEl.id = 'main-image-caption';
+                    captionEl.className = 'image-caption';
+                    mainImage.parentNode.appendChild(captionEl);
+                }
+                captionEl.textContent = fotos[0].caption;
+            }
+            
+            // Update thumbnails
+            if (thumbnailCarousel && fotos.length > 0) {
+                thumbnailCarousel.innerHTML = fotos.map((foto, index) => {
+                    const typeIcon = getPhotoTypeIcon(foto.type);
+                    return `
+                        <div class="thumb-container ${index === 0 ? 'active' : ''}">
+                            <img class="thumb" 
+                                 src="${foto.url}" 
+                                 alt="${foto.caption}" 
+                                 data-caption="${foto.caption}"
+                                 data-type="${foto.type}"
+                                 onclick="changeMainImage('${foto.url}', '${foto.caption}', this)">
+                            <div class="thumb-info">
+                                <span class="photo-type">${typeIcon}</span>
+                                <span class="photo-caption">${foto.caption}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add photo counter
+                const photoCounter = document.createElement('div');
+                photoCounter.className = 'photo-counter';
+                photoCounter.innerHTML = `
+                    <i class="fas fa-images"></i> 
+                    ${fotos.length} Foto
+                    <span class="photo-types">
+                        (${fotos.filter(f => f.type === 'main').length} Utama, 
+                         ${fotos.filter(f => f.type === 'gallery').length} Gallery)
+                    </span>
+                `;
+                thumbnailCarousel.parentNode.insertBefore(photoCounter, thumbnailCarousel);
             }
         }
 
-        function changeMainImage(src, thumbElement) {
+        function getPhotoTypeIcon(type) {
+            switch (type) {
+                case 'main': return '⭐';
+                case 'gallery': return '📸';
+                case 'default': return '🖼️';
+                default: return '📷';
+            }
+        }
+
+        function changeMainImage(src, caption, thumbElement) {
             const mainImage = document.getElementById('main-image');
+            const captionEl = document.getElementById('main-image-caption');
+            
             if (mainImage) {
                 mainImage.src = src;
+                mainImage.alt = caption;
+            }
+            
+            if (captionEl) {
+                captionEl.textContent = caption;
             }
             
             // Update active thumbnail
-            document.querySelectorAll('.thumb').forEach(thumb => thumb.classList.remove('active'));
-            thumbElement.classList.add('active');
+            document.querySelectorAll('.thumb-container').forEach(container => 
+                container.classList.remove('active'));
+            thumbElement.closest('.thumb-container').classList.add('active');
         }
 
         function bookTour() {

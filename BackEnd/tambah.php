@@ -107,7 +107,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $koneksi->prepare("INSERT INTO paket (nama, deskripsi, fotos, duration, price, itinerary, highlights, inclusions, exclusions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssdssss", $nama, $deskripsi, $fotosJson, $duration, $price, $processed_itinerary, $highlights, $inclusions, $exclusions);
         
+        // Tambahkan setelah berhasil insert paket utama
         if ($stmt->execute()) {
+            $package_id = $stmt->insert_id;
+            
+            // Handle gallery photos upload jika ada
+            if (isset($_FILES['gallery_photos']) && !empty($_FILES['gallery_photos']['name'][0])) {
+                $galleryPhotos = $_FILES['gallery_photos'];
+                $galleryCount = count($galleryPhotos['name']);
+                
+                // Create gallery directory if not exists
+                $galleryDir = 'uploads/gallery/';
+                if (!file_exists($galleryDir)) {
+                    mkdir($galleryDir, 0777, true);
+                }
+                
+                for ($i = 0; $i < $galleryCount && $i < 10; $i++) {
+                    if ($galleryPhotos['error'][$i] === UPLOAD_ERR_OK) {
+                        $fileName = $galleryPhotos['name'][$i];
+                        $fileTmpName = $galleryPhotos['tmp_name'][$i];
+                        $fileType = $galleryPhotos['type'][$i];
+                        $fileSize = $galleryPhotos['size'][$i];
+                        
+                        // Validate file
+                        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                        if (in_array($fileType, $allowedTypes) && $fileSize <= 5 * 1024 * 1024) {
+                            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                            $newFileName = 'gallery_' . $package_id . '_' . time() . '_' . $i . '.' . $fileExtension;
+                            $uploadPath = $galleryDir . $newFileName;
+                            
+                            if (move_uploaded_file($fileTmpName, $uploadPath)) {
+                                // Insert gallery photo to database
+                                $caption = $_POST['gallery_captions'][$i] ?? '';
+                                $order = $i + 1;
+                                
+                                $galleryStmt = $koneksi->prepare("INSERT INTO package_gallery (package_id, photo_filename, photo_caption, photo_order) VALUES (?, ?, ?, ?)");
+                                $galleryStmt->bind_param("issi", $package_id, $newFileName, $caption, $order);
+                                $galleryStmt->execute();
+                                $galleryStmt->close();
+                            }
+                        }
+                    }
+                }
+            }
+            
             $stmt->close();
             $koneksi->close();
             header("Location: admin.php?success=1");
