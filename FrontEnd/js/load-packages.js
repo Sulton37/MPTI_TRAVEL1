@@ -140,12 +140,6 @@ function createTourCard(package, index) {
     
     const imageId = `package-slideshow-${package.id}`;
     
-    console.log(`🖼️ Processing photos for ${nama}:`, {
-        fotos: package.fotos,
-        fotos_exist: package.fotos_exist,
-        foto_count: package.foto_count
-    });
-    
     let slideshowHTML = '';
     if (package.fotos && package.fotos.length > 0) {
         const hasRealPhotos = package.fotos_exist && package.fotos_exist.some(exists => exists === true);
@@ -154,7 +148,6 @@ function createTourCard(package, index) {
             <div class="image-slideshow loading" id="${imageId}">
                 ${package.fotos.map((foto, idx) => {
                     const isRealPhoto = package.fotos_exist && package.fotos_exist[idx] === true;
-                    console.log(`📸 Photo ${idx + 1}: ${foto}, real: ${isRealPhoto}`);
                     
                     return `
                         <img src="${foto}" 
@@ -164,8 +157,8 @@ function createTourCard(package, index) {
                              data-original-src="${foto}"
                              class="${idx === 0 ? 'active' : ''}"
                              loading="eager"
-                             onload="console.log('✅ Image loaded:', this.src); this.setAttribute('data-loaded', 'true'); this.closest('.image-slideshow').classList.remove('loading');"
-                             onerror="console.log('❌ Image failed:', this.src); handleImageError(this, ${idx});">
+                             onload="this.setAttribute('data-loaded', 'true'); this.closest('.image-slideshow').classList.remove('loading');"
+                             onerror="handleImageError(this, ${idx});">
                     `;
                 }).join('')}
                 
@@ -208,7 +201,7 @@ function createTourCard(package, index) {
                         '(Ada foto asli)' : '(Semua default)'}
                 </small>
             </div>
-            <a href="Package_1.html?id=${package.id}" class="detail-button">
+            <a href="package_detail.html?id=${package.id}" class="detail-button">
                 <i class="fas fa-info-circle"></i> Lihat Detail
             </a>
         </div>

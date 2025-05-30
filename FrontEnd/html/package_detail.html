@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Package Detail | Vacationland</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/Package_1.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../../Asset/logo/logompti.png" alt="Vacationland Logo">
+            <span>Vacationland</span>
+        </div>
+        <nav class="desktop-nav">
+            <a href="Index.html">🏠 Home</a>
+            <a href="Index.html#paket">✈️ Packages</a>
+            <a href="profile.html">👤 Profile</a>
+        </nav>
+        <div class="mobile-menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="mobile-sidebar">
+        <nav class="sidebar-nav">
+            <a href="Index.html">🏠 Home</a>
+            <a href="Index.html#paket">✈️ Packages</a>
+            <a href="profile.html">👤 Profile</a>
+        </nav>
+    </div>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading-container">
+        <div class="spinner"></div>
+        <h3>Memuat Detail Paket...</h3>
+        <p>Mohon tunggu sebentar</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="error-container" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Terjadi Kesalahan</h3>
+        <p id="error-message">Tidak dapat memuat detail paket</p>
+        <button onclick="location.reload()" class="cta-button">Coba Lagi</button>
+    </div>
+
+    <!-- Package Content -->
+    <div id="package-content" style="display: none;">
+        <!-- Hero Section -->
+        <section class="hero package-hero">
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="../../Asset/video/video1.mp4" type="video/mp4">
+            </video>
+            <div class="video-overlay"></div>
+            <!-- Perbaiki hero section -->
+            <div class="package-hero-content">
+                <div class="badge-container">
+                    <span id="duration-badge" class="duration-badge">2D1N</span>
+                    <span id="price-badge" class="price-badge">Mulai Rp 1,500,000</span>
+                </div>
+                <h1 id="package-title">Paket Wisata Yogyakarta</h1>
+                <p id="package-subtitle">Jelajahi keindahan budaya dan sejarah Yogyakarta</p>
+                <a href="#book-now" class="cta-button">Book Now</a>
+            </div>
+        </section>
+
+        <div class="package-container">
+            <div class="package-overview">
+                <div class="package-details">
+                    <!-- Overview Section -->
+                    <div class="package-section">
+                        <h2><i class="fas fa-info-circle"></i> Deskripsi Paket</h2>
+                        <p id="package-description">Deskripsi paket akan dimuat...</p>
+                        
+                        <div class="price-box" id="book-now">
+                            <h3>Harga Paket</h3>
+                            <div id="price-display" class="price-amount">Rp 1,500,000</div>
+                            <p>per orang (minimal 2 peserta)</p>
+                            <a href="#" class="cta-button" onclick="bookTour()">Pesan Sekarang</a>
+                        </div>
+                    </div>
+
+                    <!-- Itinerary Section - DIPERBAIKI LENGKAP -->
+                    <div class="package-section">
+                        <h2><i class="fas fa-calendar-alt"></i> Jadwal Perjalanan</h2>
+                        <div id="itinerary-content">
+                            <!-- Default loading state -->
+                            <div class="day-itinerary">
+                                <div class="day-header">Memuat jadwal...</div>
+                                <div class="day-content">
+                                    <div class="activity">
+                                        <div class="activity-time">--:--</div>
+                                        <div class="activity-desc">
+                                            <p>Memuat aktivitas...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- What's Included -->
+                    <div class="package-section">
+                        <h2><i class="fas fa-check-circle"></i> Yang Termasuk</h2>
+                        <ul id="inclusions-list" class="inclusion-list">
+                            <li><i class="fas fa-check-circle"></i> Memuat...</li>
+                        </ul>
+                    </div>
+
+                    <!-- What's Not Included -->
+                    <div class="package-section">
+                        <h2><i class="fas fa-times-circle"></i> Yang Tidak Termasuk</h2>
+                        <ul id="exclusions-list" class="exclusion-list">
+                            <li><i class="fas fa-times-circle"></i> Memuat...</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Package Highlights - DIPERBAIKI -->
+                <div class="package-highlights">
+                    <h2><i class="fas fa-star"></i> Highlights</h2>
+                    <div id="highlights-content">
+                        <div class="highlight-item">
+                            <h3><i class="fas fa-star"></i> Memuat highlights...</h3>
+                            <p>Sedang memuat informasi...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Section - DIPERBAIKI -->
+            <div class="gallery-section">
+                <h2><i class="fas fa-images"></i> Galeri Foto</h2>
+                <p>Lihat foto-foto destinasi yang akan Anda kunjungi</p>
+
+                <div class="main-image-container">
+                    <img id="main-image" src="../../Asset/Package_Culture/borobudur.jpg" alt="Main Gallery Image">
+                </div>
+
+                <div id="thumbnail-carousel" class="thumbnail-carousel">
+                    <img class="thumb active" src="../../Asset/Package_Culture/borobudur.jpg" alt="Gallery Image" onclick="changeMainImage(this.src, this)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <!-- Footer content sama seperti sebelumnya -->
+    </footer>
+
+    <script src="../js/mobile-nav-package.js"></script>
+    <script>
+        // Debug: Check initial state
+        console.log('🔍 Script loaded, checking initial state...');
+        console.log('Current URL:', window.location.href);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const packageId = urlParams.get('id');
+
+        console.log('📦 Package ID from URL:', packageId);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM loaded, checking elements...');
+            
+            if (!packageId) {
+                showError('ID paket tidak ditemukan dalam URL');
+                return;
+            }
+            
+            // Load package detail
+            loadPackageDetail(packageId);
+        });
+
+        async function loadPackageDetail(id) {
+            console.log('🚀 Loading package detail for ID:', id);
+            showLoading();
+            
+            try {
+                const response = await fetch(`../../BackEnd/get_package_detail.php?id=${id}`);
+                console.log('📡 Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('📦 Package data received:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                displayPackageDetail(data);
+                
+            } catch (error) {
+                console.error('❌ Error loading package detail:', error);
+                showError(error.message);
+            }
+        }
+
+        function showLoading() {
+            console.log('⏳ Showing loading state');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const packageContent = document.getElementById('package-content');
+            
+            if (loading) loading.style.display = 'flex';
+            if (error) error.style.display = 'none';
+            if (packageContent) packageContent.style.display = 'none';
+        }
+
+        function showError(message) {
+            console.error('💥 Showing error:', message);
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const packageContent = document.getElementById('package-content');
+            
+            if (loading) loading.style.display = 'none';
+            if (packageContent) packageContent.style.display = 'none';
+            
+            if (error) {
+                error.style.display = 'flex';
+                const errorMessage = document.getElementById('error-message');
+                if (errorMessage) errorMessage.textContent = message;
+            }
+        }
+
+        function displayPackageDetail(data) {
+            console.log('🎨 Displaying package detail with data:', data);
+            
+            // Hide loading, show content
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const packageContent = document.getElementById('package-content');
+            
+            if (loading) loading.style.display = 'none';
+            if (error) error.style.display = 'none';
+            if (packageContent) packageContent.style.display = 'block';
+            
+            // Update page title
+            document.title = `${data.nama} | Vacationland`;
+            
+            try {
+                updateHeroSection(data);
+                updateMainContent(data); // Ini akan memanggil updateItinerary
+                updateGallery(data.fotos);
+            } catch (updateError) {
+                console.error('❌ Error updating content:', updateError);
+                showError('Error menampilkan data paket');
+            }
+        }
+
+        function updateHeroSection(data) {
+            console.log('🏗️ Updating hero section');
+            
+            const titleEl = document.getElementById('package-title');
+            const subtitleEl = document.getElementById('package-subtitle');
+            const durationBadge = document.getElementById('duration-badge');
+            const priceBadge = document.getElementById('price-badge');
+            
+            if (titleEl) titleEl.textContent = data.nama || 'Paket Wisata';
+            if (subtitleEl) subtitleEl.textContent = data.deskripsi ? data.deskripsi.substring(0, 100) + '...' : 'Jelajahi keindahan Yogyakarta';
+            if (durationBadge) durationBadge.textContent = data.duration || '2D1N';
+            if (priceBadge && data.price) {
+                priceBadge.textContent = `Mulai Rp ${new Intl.NumberFormat('id-ID').format(data.price)}`;
+            }
+        }
+
+        function updateMainContent(data) {
+            console.log('📝 Updating main content');
+            
+            // Update description
+            const descEl = document.getElementById('package-description');
+            if (descEl) descEl.textContent = data.deskripsi || 'Deskripsi paket tidak tersedia';
+            
+            // Update price display
+            const priceDisplayEl = document.getElementById('price-display');
+            if (priceDisplayEl && data.price) {
+                priceDisplayEl.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(data.price)}`;
+            }
+            
+            // Update inclusions
+            if (data.inclusions) updateInclusions(data.inclusions);
+            
+            // Update exclusions
+            if (data.exclusions) updateExclusions(data.exclusions);
+            
+            // Update highlights
+            if (data.highlights) updateHighlights(data.highlights);
+            
+            // Update itinerary
+            if (data.itinerary) updateItinerary(data.itinerary);
+        }
+
+        function updateInclusions(inclusions) {
+            const inclusionsList = document.getElementById('inclusions-list');
+            if (inclusionsList) {
+                const items = inclusions.split('|').filter(item => item.trim());
+                inclusionsList.innerHTML = items.map(item => 
+                    `<li><i class="fas fa-check-circle"></i> ${item.trim()}</li>`
+                ).join('');
+            }
+        }
+
+        function updateExclusions(exclusions) {
+            const exclusionsList = document.getElementById('exclusions-list');
+            if (exclusionsList) {
+                const items = exclusions.split('|').filter(item => item.trim()); // DIPERBAIKI: menambahkan tanda kurung
+                exclusionsList.innerHTML = items.map(item => 
+                    `<li><i class="fas fa-times-circle"></i> ${item.trim()}</li>`
+                ).join('');
+            }
+        }
+
+        function updateHighlights(highlights) {
+            const highlightsContent = document.getElementById('highlights-content');
+            if (highlightsContent) {
+                const items = highlights.split('|').filter(item => item.trim());
+                highlightsContent.innerHTML = items.map(item => 
+                    `<div class="highlight-item">
+                        <h3><i class="fas fa-star"></i> ${item.trim()}</h3>
+                        <p>Nikmati pengalaman tak terlupakan</p>
+                    </div>`
+                ).join('');
+            }
+        }
+
+        function updateItinerary(itinerary) {
+            console.log('📅 Updating itinerary:', itinerary);
+            
+            const itineraryContent = document.getElementById('itinerary-content');
+            if (!itineraryContent) {
+                console.error('❌ Itinerary content element not found');
+                return;
+            }
+            
+            if (!itinerary || !itinerary.trim()) {
+                itineraryContent.innerHTML = `
+                    <div class="day-itinerary">
+                        <div class="day-header">Jadwal Tidak Tersedia</div>
+                        <div class="day-content">
+                            <div class="activity">
+                                <div class="activity-time">--:--</div>
+                                <div class="activity-desc">
+                                    <p>Jadwal perjalanan akan diinformasikan lebih lanjut</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Parse itinerary format dari form admin
+            console.log('🔍 Raw itinerary:', itinerary);
+            
+            // Split by double newlines to get days
+            const dayBlocks = itinerary.split('\n\n').filter(block => block.trim());
+            
+            if (dayBlocks.length === 0) {
+                updateItinerary(''); // Fallback
+                return;
+            }
+            
+            const dayHTML = dayBlocks.map((block, index) => {
+                // Parse each day block
+                const lines = block.split('\n').filter(line => line.trim());
+                
+                if (lines.length === 0) return '';
+                
+                // First line should be "Day Title: Activities"
+                const firstLine = lines[0].trim();
+                let dayTitle, activitiesText;
+                
+                if (firstLine.includes(':')) {
+                    const colonIndex = firstLine.indexOf(':');
+                    dayTitle = firstLine.substring(0, colonIndex).trim();
+                    activitiesText = firstLine.substring(colonIndex + 1).trim();
+                } else {
+                    dayTitle = `Hari ${index + 1}`;
+                    activitiesText = firstLine;
+                }
+                
+                // Add remaining lines to activities
+                if (lines.length > 1) {
+                    activitiesText += ' ' + lines.slice(1).join(' ').trim();
+                }
+                
+                // Parse activities (split by | delimiter)
+                let activities = [];
+                if (activitiesText) {
+                    activities = activitiesText.split('|').map(act => act.trim()).filter(act => act);
+                }
+                
+                if (activities.length === 0) {
+                    activities = ['Aktivitas akan diinformasikan'];
+                }
+                
+                console.log(`📋 Day ${index + 1}: "${dayTitle}" with ${activities.length} activities`);
+                
+                return createDayItinerary(dayTitle, activities, index === 0);
+            }).filter(html => html).join('');
+            
+            itineraryContent.innerHTML = dayHTML || `
+                <div class="day-itinerary">
+                    <div class="day-header">Format Jadwal Tidak Valid</div>
+                    <div class="day-content">
+                        <div class="activity">
+                            <div class="activity-time">--:--</div>
+                            <div class="activity-desc">
+                                <p>Format jadwal tidak dapat dibaca dengan benar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createDayItinerary(dayTitle, activities, isExpanded = false) {
+            console.log(`🏗️ Creating day: "${dayTitle}" with activities:`, activities);
+            
+            const activitiesHTML = activities.map(activity => {
+                return createActivityHTML(activity.trim());
+            }).join('');
+            
+            return `
+                <div class="day-itinerary">
+                    <div class="day-header ${isExpanded ? 'active' : ''}" onclick="toggleDay(this)">
+                        ${dayTitle}
+                    </div>
+                    <div class="day-content ${isExpanded ? 'expanded' : ''}">
+                        ${activitiesHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function createActivityHTML(activityText) {
+            if (!activityText || !activityText.trim()) {
+                return `
+                    <div class="activity">
+                        <div class="activity-time">--:--</div>
+                        <div class="activity-desc">
+                            <p>Aktivitas kosong</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            let time = '--:--';
+            let description = activityText;
+            
+            // Pattern 1: "09:00 - Visit Borobudur"
+            const timePattern1 = /^(\d{1,2}:\d{2})\s*-\s*(.+)$/;
+            const match1 = activityText.match(timePattern1);
+            
+            if (match1) {
+                time = match1[1];
+                description = match1[2];
+            } else {
+                // Pattern 2: "Visit Borobudur (09:00)"
+                const timePattern2 = /^(.+?)\s*\((\d{1,2}:\d{2})\)$/;
+                const match2 = activityText.match(timePattern2);
+                
+                if (match2) {
+                    description = match2[1];
+                    time = match2[2];
+                } else {
+                    // Pattern 3: "Pagi - Activity" atau "Morning - Activity"
+                    const periodPattern = /^(Pagi|Siang|Sore|Malam|Morning|Afternoon|Evening|Night)\s*-\s*(.+)$/i;
+                    const match3 = activityText.match(periodPattern);
+                    
+                    if (match3) {
+                        time = match3[1];
+                        description = match3[2];
+                    }
+                }
+            }
+            
+            return `
+                <div class="activity">
+                    <div class="activity-time">${time}</div>
+                    <div class="activity-desc">
+                        <p>${description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleDay(header) {
+            const content = header.nextElementSibling;
+            const isCurrentlyExpanded = content.classList.contains('expanded');
+            
+            // Close all other days
+            document.querySelectorAll('.day-content').forEach(day => {
+                if (day !== content) {
+                    day.classList.remove('expanded');
+                    day.previousElementSibling.classList.remove('active');
+                }
+            });
+            
+            // Toggle current day
+            if (!isCurrentlyExpanded) {
+                header.classList.add('active');
+                content.classList.add('expanded');
+                
+                // Smooth scroll to opened section
+                setTimeout(() => {
+                    header.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                }, 350);
+            } else {
+                header.classList.remove('active');
+                content.classList.remove('expanded');
+            }
+        }
+
+        function updateGallery(fotos) {
+            console.log('🖼️ Updating gallery with photos:', fotos);
+            
+            const mainImage = document.getElementById('main-image');
+            const thumbnailCarousel = document.getElementById('thumbnail-carousel');
+            
+            if (mainImage && fotos && fotos.length > 0) {
+                mainImage.src = fotos[0];
+                mainImage.alt = 'Gallery Image';
+            }
+            
+            if (thumbnailCarousel && fotos && fotos.length > 0) {
+                thumbnailCarousel.innerHTML = fotos.map((foto, index) => 
+                    `<img class="thumb ${index === 0 ? 'active' : ''}" 
+                          src="${foto}" 
+                          alt="Gallery Image ${index + 1}" 
+                          onclick="changeMainImage('${foto}', this)">`
+                ).join('');
+            }
+        }
+
+        function changeMainImage(src, thumbElement) {
+            const mainImage = document.getElementById('main-image');
+            if (mainImage) {
+                mainImage.src = src;
+            }
+            
+            // Update active thumbnail
+            document.querySelectorAll('.thumb').forEach(thumb => thumb.classList.remove('active'));
+            thumbElement.classList.add('active');
+        }
+
+        function bookTour() {
+            const packageName = document.getElementById('package-title')?.textContent || 'Paket Tour';
+            const message = `Halo! Saya tertarik dengan paket tour "${packageName}". Bisa info lebih lanjut?`;
+            const whatsappURL = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+        }
+    </script>
+</body>
+</html>

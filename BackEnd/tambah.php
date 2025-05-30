@@ -12,6 +12,21 @@ $koneksi = new mysqli("localhost", "root", "", "paket_travel");
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $duration = trim($_POST['duration'] ?? '2D1N');
+    $price = floatval($_POST['price'] ?? 0);
+    $itinerary_json = trim($_POST['itinerary'] ?? '');
+    $highlights = trim($_POST['highlights'] ?? '');
+    $inclusions = trim($_POST['inclusions'] ?? '');
+    $exclusions = trim($_POST['exclusions'] ?? '');
+    
+    // Process itinerary JSON to readable format
+    $processed_itinerary = '';
+    if (!empty($itinerary_json)) {
+        $itinerary_data = json_decode($itinerary_json, true);
+        if ($itinerary_data) {
+            $processed_itinerary = processItineraryData($itinerary_data);
+        }
+    }
     
     // Validate input length
     if (strlen($nama) > 255 || strlen($deskripsi) > 1000) {
@@ -86,14 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Save to database
-        
-        
         // Convert uploaded files array to JSON
         $fotosJson = json_encode($uploadedFiles);
         
-        $stmt = $koneksi->prepare("INSERT INTO paket (nama, deskripsi, fotos) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $nama, $deskripsi, $fotosJson);
+        $stmt = $koneksi->prepare("INSERT INTO paket (nama, deskripsi, fotos, duration, price, itinerary, highlights, inclusions, exclusions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssdssss", $nama, $deskripsi, $fotosJson, $duration, $price, $processed_itinerary, $highlights, $inclusions, $exclusions);
         
         if ($stmt->execute()) {
             $stmt->close();
@@ -119,7 +131,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Handle delete functionality
+function processItineraryData($itinerary_data) {
+    $processed = '';
+    
+    foreach ($itinerary_data as $dayId => $dayData) {
+        $processed .= $dayData['title'] . ': ';
+        
+        $activities = [];
+        foreach ($dayData['activities'] as $activity) {
+            if (!empty($activity['description'])) {
+                $time = !empty($activity['time']) ? $activity['time'] : '—';
+                if ($time !== '—' && !preg_match('/^\d/', $time)) {
+                    // If it's a period like "Pagi", format it nicely
+                    $activities[] = $time . ' - ' . $activity['description'];
+                } else {
+                    // If it's a specific time, put in parentheses
+                    $activities[] = $activity['description'] . ' (' . $time . ')';
+                }
+            }
+        }
+        
+        $processed .= implode(' | ', $activities) . "\n\n";
+    }
+    
+    return trim($processed);
+}
+
+// Handle delete functionality (same as before)
 if (isset($_GET['hapus'])) {
     $koneksi = new mysqli("localhost", "root", "", "paket_travel");
     $id = intval($_GET['hapus']);
