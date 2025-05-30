@@ -61,3 +61,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎥 Responsive hero initialized');
+    
+    // Hero video responsive handling
+    const heroVideo = document.querySelector('.hero video');
+    const hero = document.querySelector('.hero');
+    
+    if (heroVideo && hero) {
+        // Ensure video maintains aspect ratio
+        function adjustVideoSize() {
+            const heroHeight = hero.offsetHeight;
+            const heroWidth = hero.offsetWidth;
+            
+            heroVideo.style.minWidth = heroWidth + 'px';
+            heroVideo.style.minHeight = heroHeight + 'px';
+        }
+        
+        // Adjust on load and resize
+        adjustVideoSize();
+        window.addEventListener('resize', adjustVideoSize);
+        
+        // Fallback for video loading issues
+        heroVideo.addEventListener('error', function() {
+            console.warn('⚠️ Hero video failed to load');
+            hero.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        });
+        
+        // Pause video when not visible (performance optimization)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    heroVideo.play().catch(e => console.log('Video autoplay prevented'));
+                } else {
+                    heroVideo.pause();
+                }
+            });
+        });
+        
+        observer.observe(hero);
+    }
+    
+    // Hero content animations
+    const heroContent = document.querySelectorAll('.hero h1, .hero p, .hero .cta-button');
+    heroContent.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            element.style.transition = 'all 0.8s ease-out';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, 500 + (index * 200));
+    });
+});

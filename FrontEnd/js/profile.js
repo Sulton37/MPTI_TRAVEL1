@@ -91,3 +91,8 @@ window.addEventListener('load', () => {
         setInterval(changeMainImage, 5000); // Change every 5 seconds
     }, 1500);
 });
+
+document.getElementById('admin-login-btn').addEventListener('click', function() {
+    // Redirect langsung ke halaman login admin backend
+    window.location.href = '../../BackEnd/loginadmin.php';
+});

@@ -1,0 +1,32 @@
+# Allow image files to be accessed
+<FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+    Order Allow,Deny
+    Allow from all
+    
+    # Set proper MIME types
+    <IfModule mod_mime.c>
+        AddType image/jpeg .jpg .jpeg
+        AddType image/png .png
+        AddType image/gif .gif
+        AddType image/webp .webp
+    </IfModule>
+    
+    # Enable caching for images
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresDefault "access plus 1 month"
+    </IfModule>
+    
+    # Add CORS headers for cross-origin requests
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET"
+        Header set Access-Control-Allow-Headers "Content-Type"
+    </IfModule>
+</FilesMatch>
+
+# Deny access to other file types
+<FilesMatch "\.(?!jpg|jpeg|png|gif|webp).*$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
