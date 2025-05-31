@@ -13,7 +13,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $deskripsi = trim($_POST['deskripsi'] ?? '');
     $duration = trim($_POST['duration'] ?? '2D1N');
-    $price = floatval($_POST['price'] ?? 0);
+    
+    // PERBAIKAN TOTAL untuk pengolahan harga
+    $price_input = trim($_POST['price'] ?? '0');
+    
+    // Remove thousand separators (dots and commas) and keep only numbers
+    $price_cleaned = preg_replace('/[^0-9]/', '', $price_input);
+    $price = (int)$price_cleaned;
+    
+    // Log untuk debugging (opsional)
+    error_log('Processing price: input=' . $price_input . ', cleaned=' . $price_cleaned . ', final=' . $price);
+    
+    // Validate price
+    if ($price <= 0) {
+        header("Location: admin.php?error=invalid_price&price_input=" . urlencode($price_input));
+        exit;
+    }
+    
+    if ($price < 100000) {
+        header("Location: admin.php?error=price_too_low&price=" . $price);
+        exit;
+    }
+    
+    if ($price > 50000000) {
+        header("Location: admin.php?error=price_too_high&price=" . $price);
+        exit;
+    }
+    
     $itinerary_json = trim($_POST['itinerary'] ?? '');
     $highlights = trim($_POST['highlights'] ?? '');
     $inclusions = trim($_POST['inclusions'] ?? '');
@@ -23,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $processed_itinerary = '';
     if (!empty($itinerary_json)) {
         $itinerary_data = json_decode($itinerary_json, true);
-        if ($itinerary_data) {
+        if ($itinerary_data && is_array($itinerary_data)) {
             $processed_itinerary = processItineraryData($itinerary_data);
         }
     }
@@ -107,62 +133,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $koneksi->prepare("INSERT INTO paket (nama, deskripsi, fotos, duration, price, itinerary, highlights, inclusions, exclusions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssdssss", $nama, $deskripsi, $fotosJson, $duration, $price, $processed_itinerary, $highlights, $inclusions, $exclusions);
         
-        // Tambahkan setelah berhasil insert paket utama
         if ($stmt->execute()) {
-            $package_id = $stmt->insert_id;
-            
-            // Handle gallery photos upload jika ada
-            if (isset($_FILES['gallery_photos']) && !empty($_FILES['gallery_photos']['name'][0])) {
-                $galleryPhotos = $_FILES['gallery_photos'];
-                $galleryCount = count($galleryPhotos['name']);
-                
-                // Create gallery directory if not exists
-                $galleryDir = 'uploads/gallery/';
-                if (!file_exists($galleryDir)) {
-                    mkdir($galleryDir, 0777, true);
-                }
-                
-                for ($i = 0; $i < $galleryCount && $i < 10; $i++) {
-                    if ($galleryPhotos['error'][$i] === UPLOAD_ERR_OK) {
-                        $fileName = $galleryPhotos['name'][$i];
-                        $fileTmpName = $galleryPhotos['tmp_name'][$i];
-                        $fileType = $galleryPhotos['type'][$i];
-                        $fileSize = $galleryPhotos['size'][$i];
-                        
-                        // Validate file
-                        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-                        if (in_array($fileType, $allowedTypes) && $fileSize <= 5 * 1024 * 1024) {
-                            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                            $newFileName = 'gallery_' . $package_id . '_' . time() . '_' . $i . '.' . $fileExtension;
-                            $uploadPath = $galleryDir . $newFileName;
-                            
-                            if (move_uploaded_file($fileTmpName, $uploadPath)) {
-                                // Insert gallery photo to database
-                                $caption = $_POST['gallery_captions'][$i] ?? '';
-                                $order = $i + 1;
-                                
-                                $galleryStmt = $koneksi->prepare("INSERT INTO package_gallery (package_id, photo_filename, photo_caption, photo_order) VALUES (?, ?, ?, ?)");
-                                $galleryStmt->bind_param("issi", $package_id, $newFileName, $caption, $order);
-                                $galleryStmt->execute();
-                                $galleryStmt->close();
-                            }
-                        }
-                    }
-                }
-            }
-            
-            $stmt->close();
-            $koneksi->close();
-            header("Location: admin.php?success=1");
+            $package_id = $koneksi->insert_id;
+            error_log('Package saved with ID: ' . $package_id . ', Price: ' . $price);
+            header("Location: admin.php?success=1&package_id=" . $package_id . "&price=" . $price);
             exit;
         } else {
-            // Clean up uploaded files on database error
-            foreach ($uploadedFiles as $uploadedFile) {
-                unlink($uploadDir . $uploadedFile);
-            }
-            $stmt->close();
-            $koneksi->close();
-            header("Location: admin.php?error=database_error");
+            error_log('Database error: ' . $stmt->error);
+            header("Location: admin.php?error=database_error&details=" . urlencode($stmt->error));
             exit;
         }
     } else {
@@ -177,24 +155,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function processItineraryData($itinerary_data) {
     $processed = '';
     
+    if (!is_array($itinerary_data)) {
+        return $processed;
+    }
+    
     foreach ($itinerary_data as $dayId => $dayData) {
-        $processed .= $dayData['title'] . ': ';
-        
-        $activities = [];
-        foreach ($dayData['activities'] as $activity) {
-            if (!empty($activity['description'])) {
-                $time = !empty($activity['time']) ? $activity['time'] : '—';
-                if ($time !== '—' && !preg_match('/^\d/', $time)) {
-                    // If it's a period like "Pagi", format it nicely
-                    $activities[] = $time . ' - ' . $activity['description'];
-                } else {
-                    // If it's a specific time, put in parentheses
-                    $activities[] = $activity['description'] . ' (' . $time . ')';
+        if (isset($dayData['title']) && isset($dayData['activities'])) {
+            $processed .= $dayData['title'] . ":\n";
+            
+            if (is_array($dayData['activities'])) {
+                foreach ($dayData['activities'] as $activity) {
+                    if (!empty($activity['description'])) {
+                        $time = !empty($activity['time']) ? $activity['time'] : '--:--';
+                        $processed .= "  {$time} - {$activity['description']}\n";
+                    }
                 }
             }
+            
+            $processed .= "\n";
         }
-        
-        $processed .= implode(' | ', $activities) . "\n\n";
     }
     
     return trim($processed);

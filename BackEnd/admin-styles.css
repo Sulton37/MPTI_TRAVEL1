@@ -667,7 +667,7 @@ body {
 @keyframes slideInDown {
     from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
@@ -981,28 +981,376 @@ body {
     transform: translateY(-2px);
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 768px) {
+/* Itinerary Management Styles */
+.itinerary-builder {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.itinerary-day {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.itinerary-day:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.day-header-editor {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.day-header-editor:hover {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+}
+
+.day-title-input {
+    background: rgba(255,255,255,0.9);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    flex: 1;
+    margin-right: 10px;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.day-title-input:focus {
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+}
+
+.day-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-day-control {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-day-control:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+.day-toggle {
+    margin-left: 8px;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.day-activities {
+    padding: 20px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.activities-container {
+    margin-bottom: 15px;
+}
+
+.activity-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    border-color: #3498db;
+    box-shadow: 0 2px 10px rgba(52,152,219,0.1);
+}
+
+.activity-header {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 15px;
+    align-items: start;
+}
+
+.time-input {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    font-family: monospace;
+    background: #f8f9fa;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(52,152,219,0.1);
+}
+
+.activity-description {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 40px;
+    font-family: inherit;
+    background: #f8f9fa;
+}
+
+.activity-description:focus {
+    outline: none;
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(52,152,219,0.1);
+}
+
+.activity-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.btn-activity-control {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+}
+
+.btn-activity-control:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-activity-control.delete {
+    background: #dc3545;
+}
+
+.btn-activity-control.delete:hover {
+    background: #c82333;
+}
+
+.btn-activity-control.disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.btn-activity-control.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-add-activity {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-add-activity:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+}
+
+.btn-add-day {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-add-day:hover {
+    background: linear-gradient(135deg, #138496, #117a8b);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(23,162,184,0.3);
+}
+
+.itinerary-preview {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.6;
+    color: #495057;
+}
+
+.itinerary-preview:empty::before {
+    content: 'Belum ada itinerary...';
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* =================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ================================= */
+
+/* Base responsive adjustments */
+@media (max-width: 1200px) {
     .container {
-        padding: 100px 15px 30px;
+        max-width: 100%;
+        padding: 120px 15px 30px;
+    }
+    
+    .header-content {
+        padding: 0 15px;
+    }
+    
+    .admin-section {
+        padding: 30px 25px;
+        margin-bottom: 30px;
+    }
+    
+    .form-section {
+        padding: 25px 20px;
+    }
+    
+    .packages-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+/* Tablet styles */
+@media (max-width: 768px) {
+    /* Header responsive */
+    .admin-header {
+        padding: 12px 0;
+        position: fixed;
+        z-index: 1001;
     }
     
     .header-content {
         flex-direction: column;
         gap: 15px;
-        padding: 0 15px;
+        padding: 0 10px;
     }
     
-    .admin-section {
-        padding: 25px 20px;
-        margin-bottom: 25px;
+    .logo-section {
+        order: 1;
     }
     
+    .admin-info {
+        order: 2;
+        font-size: 0.9rem;
+        gap: 15px;
+    }
+    
+    .logo-section img {
+        height: 40px;
+    }
+    
+    .logo-section h1 {
+        font-size: 1.5rem;
+    }
+    
+    .logout-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    /* Container adjustments */
+    .container {
+        padding: 140px 10px 30px;
+    }
+    
+    /* Section titles */
     .section-title {
         font-size: 1.8rem;
         flex-direction: column;
-        align-items: flex-start;
+        text-align: center;
         gap: 10px;
+    }
+    
+    .section-title i {
+        font-size: 1.5rem;
+    }
+    
+    .subsection-title {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+    
+    /* Form responsive */
+    .admin-section {
+        padding: 25px 15px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .form-section {
+        padding: 20px 15px;
+        border-radius: 15px;
     }
     
     .form-grid-two {
@@ -1010,9 +1358,112 @@ body {
         gap: 20px;
     }
     
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px 15px;
+        font-size: 1rem;
+        border-radius: 10px;
+    }
+    
+    .form-group textarea {
+        min-height: 100px;
+    }
+    
+    /* Price input responsive */
+    .price-input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .currency-symbol,
+    .price-suffix {
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .price-input-wrapper input {
+        text-align: center;
+        border-radius: 0 0 8px 8px;
+    }
+    
+    /* File upload responsive */
+    .file-upload-area {
+        padding: 30px 15px;
+        min-height: 150px;
+    }
+    
+    .upload-icon {
+        font-size: 2.5rem;
+    }
+    
+    .upload-content h4 {
+        font-size: 1.1rem;
+    }
+    
+    .upload-content p {
+        font-size: 0.9rem;
+    }
+    
+    .upload-requirements {
+        margin-top: 15px;
+    }
+    
+    .req-item {
+        font-size: 0.85rem;
+        padding: 8px 0;
+    }
+    
+    /* Button responsive */
+    .form-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn-primary,
+    .btn-preview,
+    .btn-submit {
+        width: 100%;
+        padding: 15px 20px;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+    
+    /* Packages grid responsive */
     .packages-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+    
+    .package-card {
+        margin-bottom: 20px;
+    }
+    
+    .package-image {
+        height: 200px;
+    }
+    
+    .package-content {
+        padding: 20px 15px;
+    }
+    
+    .package-title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+    
+    .package-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
     }
     
     .package-actions {
@@ -1020,175 +1471,477 @@ body {
         gap: 10px;
     }
     
-    .view-btn, .btn-gallery, .delete-btn {
+    .view-btn,
+    .btn-gallery,
+    .delete-btn {
         width: 100%;
-        justify-content: center;
+        text-align: center;
+        padding: 12px 15px;
+        font-size: 0.9rem;
     }
     
-    .form-actions {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .btn-primary, .btn-preview, .btn-submit {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .modal-content {
-        width: 98%;
-        margin: 10px 5px;
-        max-height: 95vh;
-    }
-    
-    .modal-header {
-        padding: 20px;
-    }
-    
-    .modal-body {
-        padding: 20px 15px;
-    }
-    
-    #existingPhotos {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 15px;
+    /* Itinerary responsive */
+    .itinerary-builder {
         padding: 15px;
     }
     
-    .photo-preview {
-        height: 80px;
+    .itinerary-day {
+        margin-bottom: 20px;
     }
     
-    .photo-info {
-        padding: 8px;
+    .day-header-editor {
+        padding: 15px;
+    }
+    
+    .day-title-input {
+        font-size: 1rem;
+    }
+    
+    .day-controls {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .btn-day-control {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-width: auto;
+    }
+    
+    .activity-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .activity-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .time-input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .activity-description {
+        min-height: 80px;
+    }
+    
+    .activity-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 15px;
+    }
+    
+    .btn-activity-control {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+    
+    .btn-add-activity,
+    .btn-add-day {
+        width: 100%;
+        padding: 15px;
+        font-size: 1rem;
+        margin-top: 15px;
+    }
+    
+    .itinerary-preview {
+        max-height: 200px;
+        font-size: 0.9rem;
+        padding: 15px;
+    }
+    
+    /* Messages responsive */
+    .error,
+    .success {
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+    
+    /* No packages state */
+    .no-packages {
+        padding: 40px 20px;
+    }
+    
+    .no-packages i {
+        font-size: 3rem;
+    }
+    
+    .no-packages h3 {
+        font-size: 1.3rem;
     }
 }
 
+/* Mobile styles */
 @media (max-width: 480px) {
+    /* Ultra compact header */
+    .admin-header {
+        padding: 10px 0;
+    }
+    
+    .header-content {
+        padding: 0 8px;
+    }
+    
+    .logo-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .logo-section img {
+        height: 35px;
+    }
+    
+    .logo-section h1 {
+        font-size: 1.2rem;
+    }
+    
+    .admin-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+    
+    .logout-btn {
+        padding: 8px 15px;
+        font-size: 0.8rem;
+        border-radius: 20px;
+    }
+    
+    /* Container ultra compact */
+    .container {
+        padding: 160px 5px 20px;
+    }
+    
+    /* Sections ultra compact */
     .admin-section {
-        padding: 20px 15px;
-        border-radius: 15px;
+        padding: 20px 10px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+    }
+    
+    .form-section {
+        padding: 15px 10px;
+        border-radius: 12px;
     }
     
     .section-title {
         font-size: 1.5rem;
+        margin-bottom: 20px;
     }
     
     .subsection-title {
         font-size: 1.2rem;
+        margin-bottom: 15px;
     }
     
-    .file-upload-area {
-        padding: 25px 15px;
+    /* Form ultra compact */
+    .form-group {
+        margin-bottom: 15px;
     }
     
-    .upload-requirements {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    #existingPhotos {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 10px;
-        padding: 10px;
-    }
-    
-    .photo-preview {
-        height: 60px;
-    }
-    
-    .photo-caption {
-        font-size: 0.75rem;
-        min-height: 16px;
-    }
-    
-    .photo-meta {
-        font-size: 0.65rem;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    body {
-        background: linear-gradient(-45deg, #1a1a1a, #2d2d2d, #3d3d3d, #4d4d4d);
-        color: #f0f0f0;
-    }
-    
-    .admin-section {
-        background: rgba(45, 45, 45, 0.95);
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #f0f0f0;
-    }
-    
-    .form-section {
-        background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 50%, #2d2d2d 100%);
-        border-color: rgba(255, 255, 255, 0.1);
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
     }
     
     .form-group input,
     .form-group select,
     .form-group textarea {
-        background: #3d3d3d;
-        border-color: #555;
-        color: #f0f0f0;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        border-radius: 8px;
     }
     
-    .package-card {
-        background: #3d3d3d;
-        border-color: #555;
+    .form-help {
+        font-size: 0.75rem;
+        margin-top: 4px;
     }
     
+    /* Price input ultra compact */
+    .currency-symbol,
+    .price-suffix {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+    
+    /* File upload ultra compact */
+    .file-upload-area {
+        padding: 20px 10px;
+        min-height: 120px;
+    }
+    
+    .upload-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .upload-content h4 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .upload-content p {
+        font-size: 0.8rem;
+    }
+    
+    .req-item {
+        font-size: 0.8rem;
+        padding: 6px 0;
+    }
+    
+    /* Buttons ultra compact */
+    .btn-primary,
+    .btn-preview,
+    .btn-submit {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+    
+    /* Package cards ultra compact */
+    .package-image {
+        height: 180px;
+    }
+    
+    .package-content {
+        padding: 15px 10px;
+    }
+    
+    .package-title {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+    
+    .package-description {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: 15px;
+    }
+    
+    .package-meta {
+        margin: 10px 0;
+    }
+    
+    .duration-badge,
+    .price-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+    
+    .package-actions {
+        gap: 8px;
+    }
+    
+    .view-btn,
+    .btn-gallery,
+    .delete-btn {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    
+    /* Itinerary ultra compact */
+    .itinerary-day {
+        margin-bottom: 15px;
+    }
+    
+    .day-header-editor {
+        padding: 12px;
+    }
+    
+    .day-title-input {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+    
+    .btn-day-control {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+    
+    .activity-item {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .time-input {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .activity-description {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        min-height: 70px;
+    }
+    
+    .btn-activity-control {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        min-width: 70px;
+    }
+    
+    .btn-add-activity,
+    .btn-add-day {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .itinerary-preview {
+        max-height: 150px;
+        font-size: 0.8rem;
+        padding: 12px;
+    }
+    
+    /* Messages ultra compact */
+    .error,
+    .success {
+        padding: 12px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+    
+    /* Modal responsive */
     .modal-content {
-        background: #2d2d2d;
-        color: #f0f0f0;
+        width: 95%;
+        max-width: none;
+        margin: 10px;
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.2rem;
     }
     
     .modal-body {
-        background: #1a1a1a;
+        padding: 15px;
     }
     
+    /* Gallery grid ultra compact */
     #existingPhotos {
-        background: #3d3d3d;
-        border-color: #555;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
     }
     
     .photo-item {
-        background: #4d4d4d;
-        border-color: #666;
+        border-radius: 8px;
+    }
+    
+    .photo-preview {
+        height: 120px;
+    }
+    
+    .photo-info {
+        padding: 8px;
+    }
+    
+    .photo-caption {
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+    
+    .photo-meta {
+        font-size: 0.7rem;
+    }
+    
+    .photo-actions {
+        gap: 5px;
+        margin-top: 8px;
+    }
+    
+    .btn-edit-photo,
+    .btn-delete-photo,
+    .btn-move-up,
+    .btn-move-down {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+        min-width: auto;
+    }
+}
+
+/* Landscape orientation fixes */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        padding-top: 100px;
+    }
+    
+    .admin-header {
+        padding: 8px 0;
+    }
+    
+    .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .logo-section {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .admin-info {
+        flex-direction: row;
+        gap: 15px;
     }
 }
 
 /* Print styles */
 @media print {
     .admin-header,
-    .form-actions,
-    .package-actions,
     .btn-primary,
     .btn-preview,
     .btn-submit,
-    .view-btn,
-    .btn-gallery,
-    .delete-btn {
+    .package-actions,
+    .form-actions,
+    .btn-add-day,
+    .btn-add-activity,
+    .activity-controls,
+    .day-controls {
         display: none !important;
     }
     
     .container {
-        padding: 20px;
+        padding: 20px 0;
+        max-width: 100%;
     }
     
     .admin-section {
-        break-inside: avoid;
+        border: 1px solid #ddd;
         margin-bottom: 20px;
-        box-shadow: none;
-        border: 1px solid #ccc;
+        page-break-inside: avoid;
     }
     
-    .packages-grid {
-        grid-template-columns: 1fr;
+    .package-card {
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
     }
 }
 
-/* Focus and accessibility improvements */
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .logo-section img {
+        image-rendering: -webkit-optimize-contrast;
+    }
+    
+    .package-image img {
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
+
+/* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -1196,213 +1949,278 @@ body {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
-/* High contrast mode */
-@media (prefers-contrast: high) {
-    .admin-section {
-        border: 2px solid #000;
-        box-shadow: none;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        border: 2px solid #000;
-    }
-    
-    .btn-primary,
-    .btn-preview,
-    .btn-submit {
-        border: 2px solid #000;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    body {
-        background: linear-gradient(-45deg, #1a1a1a, #2d2d2d, #3d3d3d, #4d4d4d);
-        color: #f0f0f0;
-    }
-    
-    .admin-section {
-        background: rgba(45, 45, 45, 0.95);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .form-section {
-        background: rgba(30, 30, 30, 0.8);
-        border-color: #444;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        background: #333;
-        border-color: #555;
-        color: #f0f0f0;
-    }
-    
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        background: #444;
-        border-color: #3498db;
-    }
-    
-    .package-card {
-        background: #333;
-        border-color: #555;
-    }
-    
-    .modal-content {
-        background: #2d2d2d;
-        color: #f0f0f0;
-    }
-    
-    .existing-photos-grid {
-        background: #333;
-        border-color: #555;
-    }
-    
-    .photo-management-item {
-        background: #444;
-        border-color: #666;
-    }
-}
-
-/* Reduce animations for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-    .admin-section::before,
-    .form-section::before,
-    .btn-primary::before,
-    .btn-preview::before,
-    .btn-submit::before,
-    .package-card::before {
-        animation: none !important;
-    }
-    
-    .admin-header {
-        animation: none !important;
-    }
-    
-    body {
-        animation: none !important;
-    }
-}
-
-/* Touch device improvements */
-@media (hover: none) and (pointer: coarse) {
+/* Touch-friendly adjustments */
+@media (pointer: coarse) {
     .btn-primary,
     .btn-preview,
     .btn-submit,
     .view-btn,
     .btn-gallery,
-    .delete-btn {
+    .delete-btn,
+    .btn-day-control,
+    .btn-activity-control {
         min-height: 44px;
-        padding: 12px 20px;
+        min-width: 44px;
     }
     
     .form-group input,
     .form-group select,
     .form-group textarea {
         min-height: 44px;
-        padding: 12px 15px;
-    }
-    
-    .btn-edit-photo,
-    .btn-delete-photo {
-        min-width: 32px;
-        min-height: 32px;
-    }
-    
-    .btn-move-up,
-    .btn-move-down {
-        min-height: 28px;
-        padding: 4px 8px;
-    }
-    
-    .photo-management-item {
-        min-height: 160px;
-    }
-    
-    .photo-preview {
-        height: 80px;
     }
 }
 
-/* Specific fixes for very small screens */
-@media (max-width: 320px) {
-    .container {
-        padding: 90px 8px 20px;
+/* Add to admin-styles.css */
+
+/* Animation keyframes */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Field error styling */
+.field-error {
+    color: #e74c3c !important;
+    font-size: 0.9rem !important;
+    margin-top: 5px !important;
+    padding: 8px 12px !important;
+    background: rgba(231, 76, 60, 0.1) !important;
+    border-radius: 5px !important;
+    border-left: 3px solid #e74c3c !important;
+    animation: slideInDown 0.3s ease !important;
+}
+
+/* File preview styling */
+#file-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.file-preview-item {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.file-preview-item:hover {
+    border-color: #3498db;
+    transform: translateY(-2px);
+}
+
+.file-preview-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.file-preview-item .file-name {
+    font-size: 0.8rem;
+    color: #666;
+    word-break: break-all;
+}
+
+/* Mobile Navigation Styles */
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle span {
+    width: 25px;
+    height: 3px;
+    background: white;
+    margin: 3px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    z-index: 1002;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-sidebar.active {
+    right: 0;
+}
+
+.mobile-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-logo img {
+    height: 35px;
+    border-radius: 6px;
+}
+
+.mobile-logo span {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.mobile-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.mobile-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-nav {
+    padding: 20px 0;
+}
+
+.mobile-nav a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.mobile-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: #3498db;
+    padding-left: 30px;
+}
+
+.mobile-nav a i {
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+.mobile-nav a span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.mobile-logout {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+    color: #e74c3c !important;
+}
+
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Show mobile elements only on mobile */
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: flex;
     }
     
-    .admin-section {
-        padding: 15px 10px;
-        margin-bottom: 20px;
+    .admin-info .logout-text {
+        display: none;
     }
     
-    .form-section {
-        padding: 12px;
+    .admin-info {
+        font-size: 0.8rem;
     }
     
-    .section-title {
-        font-size: 1.2rem;
-        line-height: 1.3;
+    .logout-btn {
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-sidebar {
+        width: 100%;
+        right: -100%;
     }
     
-    .subsection-title {
-        font-size: 1rem;
+    .admin-info span {
+        display: none;
     }
     
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 8px 10px;
-        font-size: 0.85rem;
-    }
-    
-    .existing-photos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        gap: 4px;
+    .logout-btn {
+        min-width: 44px;
+        min-height: 44px;
         padding: 8px;
+        border-radius: 50%;
     }
     
-    .photo-management-item {
-        min-height: 90px;
-    }
-    
-    .photo-preview {
-        height: 45px;
-    }
-    
-    .photo-caption {
-        font-size: 0.55rem;
-        min-height: 10px;
-    }
-    
-    .photo-meta {
-        font-size: 0.45rem;
-    }
-    
-    .btn-edit-photo,
-    .btn-delete-photo {
-        width: 18px;
-        height: 18px;
-        font-size: 0.55rem;
-    }
-    
-    .modal-content {
-        width: 99%;
-        margin: 5px 2px;
-    }
-    
-    .modal-header {
-        padding: 10px 12px;
-    }
-    
-    .modal-body {
-        padding: 12px 8px;
+    .logout-btn i {
+        margin: 0;
     }
 }

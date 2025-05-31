@@ -124,13 +124,31 @@
                 </div>
 
                 <!-- Package Highlights - DIPERBAIKI -->
-                <div class="package-highlights">
-                    <h2><i class="fas fa-star"></i> Highlights</h2>
+                <div class="package-highlights" id="package-highlights">
+                    <h2>Tour Highlights</h2>
                     <div id="highlights-content">
-                        <div class="highlight-item">
-                            <h3><i class="fas fa-star"></i> Memuat highlights...</h3>
-                            <p>Sedang memuat informasi...</p>
-                        </div>
+                        <!-- Highlights will be populated here -->
+                    </div>
+
+                    <h2>Package Details</h2>
+                    <div class="price-box" id="price-section">
+                        <span class="price-amount" id="price-display">Hubungi untuk harga</span>
+                    </div>
+
+                    <h3>What's Included</h3>
+                    <ul class="inclusion-list" id="inclusions-list">
+                        <!-- Inclusions will be populated here -->
+                    </ul>
+
+                    <h3>Not Included</h3>
+                    <ul class="exclusion-list" id="exclusions-list">
+                        <!-- Exclusions will be populated here -->
+                    </ul>
+
+                    <div style="margin-top: 30px;">
+                        <button onclick="bookTour()" class="cta-button">
+                            <i class="fas fa-calendar-check"></i> Book This Tour
+                        </button>
                     </div>
                 </div>
             </div>
@@ -281,34 +299,17 @@
             }
         }
 
-        function updateHeroSection(data) {
-            console.log('🏗️ Updating hero section');
-            
-            const titleEl = document.getElementById('package-title');
-            const subtitleEl = document.getElementById('package-subtitle');
-            const durationBadge = document.getElementById('duration-badge');
-            const priceBadge = document.getElementById('price-badge');
-            
-            if (titleEl) titleEl.textContent = data.nama || 'Paket Wisata';
-            if (subtitleEl) subtitleEl.textContent = data.deskripsi ? data.deskripsi.substring(0, 100) + '...' : 'Jelajahi keindahan Yogyakarta';
-            if (durationBadge) durationBadge.textContent = data.duration || '2D1N';
-            if (priceBadge && data.price) {
-                priceBadge.textContent = `Mulai Rp ${new Intl.NumberFormat('id-ID').format(data.price)}`;
-            }
-        }
+        // Update function untuk display harga
 
         function updateMainContent(data) {
-            console.log('📝 Updating main content');
+            console.log('📝 Updating main content with data:', data);
             
             // Update description
             const descEl = document.getElementById('package-description');
             if (descEl) descEl.textContent = data.deskripsi || 'Deskripsi paket tidak tersedia';
             
-            // Update price display
-            const priceDisplayEl = document.getElementById('price-display');
-            if (priceDisplayEl && data.price) {
-                priceDisplayEl.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(data.price)}`;
-            }
+            // Update price display - PERBAIKAN
+            updatePriceDisplay(data);
             
             // Update inclusions
             if (data.inclusions) updateInclusions(data.inclusions);
@@ -323,37 +324,217 @@
             if (data.itinerary) updateItinerary(data.itinerary);
         }
 
-        function updateInclusions(inclusions) {
-            const inclusionsList = document.getElementById('inclusions-list');
-            if (inclusionsList) {
-                const items = inclusions.split('|').filter(item => item.trim());
-                inclusionsList.innerHTML = items.map(item => 
-                    `<li><i class="fas fa-check-circle"></i> ${item.trim()}</li>`
-                ).join('');
+        function updatePriceDisplay(data) {
+            console.log('💰 Updating price display:', {
+                price: data.price,
+                formatted_price: data.formatted_price,
+                type: typeof data.price
+            });
+            
+            const priceDisplayEl = document.getElementById('price-display');
+            const priceBadge = document.getElementById('price-badge');
+            
+            if (data.price && data.price > 0) {
+                const formattedPrice = data.formatted_price || formatPrice(data.price);
+                
+                if (priceDisplayEl) {
+                    priceDisplayEl.innerHTML = `
+                        <span class="price-amount">${formattedPrice}</span>
+                        <span class="price-note">per person</span>
+                    `;
+                }
+                
+                if (priceBadge) {
+                    priceBadge.textContent = formattedPrice;
+                }
+                
+                console.log('✅ Price updated to:', formattedPrice);
+            } else {
+                const defaultText = 'Hubungi untuk harga';
+                
+                if (priceDisplayEl) {
+                    priceDisplayEl.innerHTML = `<span class="price-amount">${defaultText}</span>`;
+                }
+                
+                if (priceBadge) {
+                    priceBadge.textContent = defaultText;
+                }
+                
+                console.log('⚠️ No price data, showing default text');
             }
+        }
+
+        function formatPrice(price) {
+            if (!price || price <= 0) return 'Hubungi untuk harga';
+            
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(price);
+        }
+
+        function updateHeroSection(data) {
+            console.log('🏗️ Updating hero section');
+            
+            const titleEl = document.getElementById('package-title');
+            const subtitleEl = document.getElementById('package-subtitle');
+            const durationBadge = document.getElementById('duration-badge');
+            const priceBadge = document.getElementById('price-badge');
+            
+            if (titleEl) titleEl.textContent = data.nama || 'Paket Wisata';
+            if (subtitleEl) subtitleEl.textContent = data.deskripsi ? data.deskripsi.substring(0, 100) + '...' : 'Jelajahi keindahan Yogyakarta';
+            if (durationBadge) durationBadge.textContent = data.duration || '2D1N';
+            
+            // Update price badge
+            if (priceBadge) {
+                if (data.price && data.price > 0) {
+                    priceBadge.textContent = data.formatted_price || formatPrice(data.price);
+                } else {
+                    priceBadge.textContent = 'Hubungi untuk harga';
+                }
+            }
+        }
+
+        function updateInclusions(inclusions) {
+            console.log('✅ Updating inclusions:', inclusions);
+            
+            const inclusionsList = document.getElementById('inclusions-list');
+            if (!inclusionsList) {
+                console.warn('Inclusions list element not found');
+                return;
+            }
+            
+            if (!inclusions || !inclusions.trim()) {
+                inclusionsList.innerHTML = `
+                    <li><i class="fas fa-check"></i> Transportasi AC</li>
+                    <li><i class="fas fa-check"></i> Tiket masuk wisata</li>
+                    <li><i class="fas fa-check"></i> Makan sesuai program</li>
+                    <li><i class="fas fa-check"></i> Tour guide</li>
+                `;
+                return;
+            }
+            
+            // Split by newlines and create list items
+            const inclusionLines = inclusions.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            let inclusionsHTML = '';
+            
+            inclusionLines.forEach(line => {
+                // Remove bullet points from start of line
+                let cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
+                if (cleanLine) {
+                    inclusionsHTML += `<li><i class="fas fa-check"></i> ${cleanLine}</li>`;
+                }
+            });
+            
+            if (!inclusionsHTML) {
+                inclusionsHTML = `
+                    <li><i class="fas fa-check"></i> Transportasi AC</li>
+                    <li><i class="fas fa-check"></i> Tiket masuk wisata</li>
+                    <li><i class="fas fa-check"></i> Makan sesuai program</li>
+                `;
+            }
+            
+            inclusionsList.innerHTML = inclusionsHTML;
         }
 
         function updateExclusions(exclusions) {
+            console.log('❌ Updating exclusions:', exclusions);
+            
             const exclusionsList = document.getElementById('exclusions-list');
-            if (exclusionsList) {
-                const items = exclusions.split('|').filter(item => item.trim()); // DIPERBAIKI: menambahkan tanda kurung
-                exclusionsList.innerHTML = items.map(item => 
-                    `<li><i class="fas fa-times-circle"></i> ${item.trim()}</li>`
-                ).join('');
+            if (!exclusionsList) {
+                console.warn('Exclusions list element not found');
+                return;
             }
+            
+            if (!exclusions || !exclusions.trim()) {
+                exclusionsList.innerHTML = `
+                    <li><i class="fas fa-times"></i> Tiket pesawat</li>
+                    <li><i class="fas fa-times"></i> Pengeluaran pribadi</li>
+                    <li><i class="fas fa-times"></i> Tips guide</li>
+                    <li><i class="fas fa-times"></i> Asuransi perjalanan</li>
+                `;
+                return;
+            }
+            
+            // Split by newlines and create list items
+            const exclusionLines = exclusions.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            let exclusionsHTML = '';
+            
+            exclusionLines.forEach(line => {
+                // Remove bullet points from start of line
+                let cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
+                if (cleanLine) {
+                    exclusionsHTML += `<li><i class="fas fa-times"></i> ${cleanLine}</li>`;
+                }
+            });
+            
+            if (!exclusionsHTML) {
+                exclusionsHTML = `
+                    <li><i class="fas fa-times"></i> Tiket pesawat</li>
+                    <li><i class="fas fa-times"></i> Pengeluaran pribadi</li>
+                    <li><i class="fas fa-times"></i> Tips guide</li>
+                `;
+            }
+            
+            exclusionsList.innerHTML = exclusionsHTML;
         }
 
         function updateHighlights(highlights) {
+            console.log('⭐ Updating highlights:', highlights);
+            
             const highlightsContent = document.getElementById('highlights-content');
-            if (highlightsContent) {
-                const items = highlights.split('|').filter(item => item.trim());
-                highlightsContent.innerHTML = items.map(item => 
-                    `<div class="highlight-item">
-                        <h3><i class="fas fa-star"></i> ${item.trim()}</h3>
-                        <p>Nikmati pengalaman tak terlupakan</p>
-                    </div>`
-                ).join('');
+            if (!highlightsContent) {
+                console.warn('Highlights content element not found');
+                return;
             }
+            
+            if (!highlights || !highlights.trim()) {
+                highlightsContent.innerHTML = `
+                    <div class="highlight-item">
+                        <h3><i class="fas fa-star"></i> Paket Wisata Yogyakarta</h3>
+                        <p>Jelajahi keindahan budaya dan sejarah Yogyakarta.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Split by newlines and process each line
+            const highlightLines = highlights.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            let highlightsHTML = '';
+            
+            highlightLines.forEach((line, index) => {
+                // Remove bullet points (•, -, *) from start of line
+                let cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
+                
+                if (cleanLine) {
+                    // Create a simple title from the line (first 30 chars)
+                    const title = cleanLine.length > 30 ? cleanLine.substring(0, 30) + '...' : cleanLine;
+                    
+                    highlightsHTML += `
+                        <div class="highlight-item">
+                            <h3><i class="fas fa-star"></i> ${title}</h3>
+                            <p>${cleanLine}</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (!highlightsHTML) {
+                highlightsHTML = `
+                    <div class="highlight-item">
+                        <h3><i class="fas fa-star"></i> Paket Wisata Spesial</h3>
+                        <p>Nikmati pengalaman wisata yang tak terlupakan.</p>
+                    </div>
+                `;
+            }
+            
+            highlightsContent.innerHTML = highlightsHTML;
         }
 
         function updateItinerary(itinerary) {

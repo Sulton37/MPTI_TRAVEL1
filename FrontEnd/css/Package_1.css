@@ -1543,3 +1543,51 @@ select {
 .price-badge {
     background: rgba(231, 76, 60, 0.9);
 }
+
+.highlight-item {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.highlight-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-left-color: #2980b9;
+}
+
+.highlight-item h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.highlight-item h3 i {
+    color: #f39c12;
+    font-size: 1rem;
+}
+
+.highlight-item p {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .highlight-item {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+    
+    .highlight-item h3 {
+        font-size: 1rem;
+    }
+}

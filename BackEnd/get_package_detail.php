@@ -34,7 +34,8 @@ try {
     
     // Get package data
     $stmt = $koneksi->prepare("
-        SELECT id, nama, deskripsi, fotos, itinerary, highlights, inclusions, exclusions, price, duration
+        SELECT id, nama, deskripsi, fotos, itinerary, highlights, inclusions, exclusions, 
+               CAST(price AS DECIMAL(12,2)) as price, duration
         FROM paket 
         WHERE id = ? 
         LIMIT 1
@@ -138,7 +139,15 @@ try {
         'inclusions' => trim($package['inclusions'] ?? ''),
         'exclusions' => trim($package['exclusions'] ?? ''),
         'price' => $package['price'] ? (float)$package['price'] : null,
+        'price_raw' => $package['price'], // Raw value dari database
+        'formatted_price' => $package['price'] ? 'Rp ' . number_format($package['price'], 0, ',', '.') : null,
         'duration' => trim($package['duration'] ?? '2D1N'),
+        'debug_price' => [
+            'db_value' => $package['price'],
+            'db_type' => gettype($package['price']),
+            'cast_float' => (float)$package['price'],
+            'formatted' => number_format($package['price'], 0, ',', '.')
+        ],
         'total_photos' => count($processedFotos),
         'load_time' => round((microtime(true) - $startTime) * 1000, 2) . 'ms'
     ];
