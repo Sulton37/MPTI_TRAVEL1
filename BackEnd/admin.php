@@ -147,20 +147,21 @@ if (isset($_GET['hapus'])) {
 </style>
 </head>
 <body>
-    <header class="admin-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <img src="../Asset/logo/logompti.png" alt="Vacationland Logo">
-                <h1>Admin Panel</h1>
-            </div>
-            <div class="admin-info">
-                <span>👤 <?= htmlspecialchars($_SESSION['admin_name'] ?? 'Administrator') ?></span>
-                <a href="loginadmin.php?logout=1" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </div>
+    <!-- Update bagian header untuk konsistensi -->
+<header class="admin-header">
+    <div class="header-content">
+        <div class="logo-section">
+            <img src="../Asset/logo/logompti.png" alt="Vacationland Logo">
+            <h1>Vacationland Admin</h1>
         </div>
-    </header>
+        <div class="admin-info">
+            <span><i class="fas fa-user-shield"></i> Admin Panel</span>
+            <a href="loginadmin.php?logout=1" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+</header>
 
     <div class="container">
         <?= $message ?>
@@ -168,181 +169,111 @@ if (isset($_GET['hapus'])) {
         <!-- Form Tambah Paket -->
         <div class="admin-section">
             <h2 class="section-title">
-                <i class="fas fa-plus-circle"></i> Tambah Paket Wisata Baru
+                <i class="fas fa-plus-circle"></i>
+                Tambah Paket Wisata Baru
             </h2>
             
-            <form action="tambah.php" method="post" enctype="multipart/form-data" class="admin-form">
-                <!-- Informasi Dasar Paket -->
+            <form action="tambah.php" method="POST" enctype="multipart/form-data">
+                <!-- Informasi Dasar -->
                 <div class="form-section">
                     <h3 class="subsection-title">
-                        <i class="fas fa-info-circle"></i> Informasi Dasar Paket
+                        <i class="fas fa-info-circle"></i>
+                        Informasi Dasar Paket
                     </h3>
                     
                     <div class="form-grid-two">
                         <div class="form-group">
                             <label for="nama">
-                                <i class="fas fa-tag"></i> Nama Paket <span class="required">*</span>
+                                <i class="fas fa-tag"></i>
+                                Nama Paket <span class="required">*</span>
                             </label>
-                            <input type="text" id="nama" name="nama" required maxlength="255" 
-                                   placeholder="Contoh: 2D1N Paket Wisata Yogyakarta">
+                            <input type="text" id="nama" name="nama" required 
+                                   placeholder="Contoh: 2D1N Yogyakarta Cultural Tour">
+                            <small class="form-help">Nama paket yang menarik dan deskriptif</small>
                         </div>
                         
                         <div class="form-group">
                             <label for="duration">
-                                <i class="fas fa-clock"></i> Durasi Paket <span class="required">*</span>
+                                <i class="fas fa-clock"></i>
+                                Durasi
                             </label>
-                            <select id="duration" name="duration" required onchange="updateItineraryDays()">
-                                <option value="1D0N">1 Hari (Tanpa Menginap)</option>
-                                <option value="2D1N" selected>2 Hari 1 Malam</option>
-                                <option value="3D2N">3 Hari 2 Malam</option>
-                                <option value="4D3N">4 Hari 3 Malam</option>
-                                <option value="5D4N">5 Hari 4 Malam</option>
+                            <select id="duration" name="duration">
+                                <option value="1D">1 Hari (1D)</option>
+                                <option value="2D1N" selected>2 Hari 1 Malam (2D1N)</option>
+                                <option value="3D2N">3 Hari 2 Malam (3D2N)</option>
+                                <option value="4D3N">4 Hari 3 Malam (4D3N)</option>
+                                <option value="5D4N">5 Hari 4 Malam (5D4N)</option>
+                                <option value="Custom">Custom</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="deskripsi">
-                            <i class="fas fa-align-left"></i> Deskripsi Paket <span class="required">*</span>
+                            <i class="fas fa-align-left"></i>
+                            Deskripsi Paket <span class="required">*</span>
                         </label>
-                        <textarea id="deskripsi" name="deskripsi" rows="4" required maxlength="1000" 
-                                  placeholder="Deskripsikan paket wisata ini secara menarik dan informatif"></textarea>
+                        <textarea id="deskripsi" name="deskripsi" rows="4" required
+                         placeholder="Deskripsikan paket wisata dengan menarik. Jelaskan apa yang membuat paket ini istimewa..."></textarea>
+                        <small class="form-help">Deskripsi yang menarik akan meningkatkan minat customer</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="price">
-                            <i class="fas fa-money-bill-wave"></i> Harga Paket
+                            <i class="fas fa-money-bill-wave"></i>
+                            Harga per Orang
                         </label>
                         <div class="price-input-wrapper">
                             <span class="currency-symbol">Rp</span>
-                            <input type="number" id="price" name="price" min="0" step="1000" 
-                                   placeholder="0">
+                            <input type="number" id="price" name="price" 
+                                   placeholder="500000" min="0" step="1000">
                             <span class="price-suffix">per orang</span>
                         </div>
-                        <small class="form-help">Kosongkan jika harga akan ditentukan kemudian</small>
+                        <small class="form-help">Harga sudah termasuk yang ada di inclusion</small>
                     </div>
                 </div>
-
-                <!-- Upload Foto -->
+                
+                <!-- Upload Foto Utama -->
                 <div class="form-section">
                     <h3 class="subsection-title">
-                        <i class="fas fa-camera"></i> Upload Foto Paket
+                        <i class="fas fa-camera"></i>
+                        Foto Utama Paket
                     </h3>
                     
                     <div class="file-upload-area">
-                        <input type="file" name="fotos[]" multiple accept="image/*" required>
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
                         <div class="upload-content">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
-                            <h4>Drag & Drop Foto atau Klik untuk Pilih</h4>
-                            <p>Upload 3-6 foto untuk paket ini</p>
+                            <h4>Upload Foto Paket (3-6 foto)</h4>
+                            <p>Pilih foto terbaik untuk menarik perhatian customer</p>
+                            <input type="file" id="fotos" name="fotos[]" multiple accept="image/*" required>
+                            
                             <div class="upload-requirements">
-                                <div class="req-item">
-                                    <i class="fas fa-check"></i> Format: JPG, JPEG, PNG
-                                </div>
-                                <div class="req-item">
-                                    <i class="fas fa-check"></i> Ukuran maksimal: 5MB per foto
-                                </div>
-                                <div class="req-item">
-                                    <i class="fas fa-check"></i> Minimal 3 foto, maksimal 6 foto
-                                </div>
+                                <span class="req-item">
+                                    <i class="fas fa-images"></i> 3-6 Foto
+                                </span>
+                                <span class="req-item">
+                                    <i class="fas fa-file-image"></i> JPG/PNG
+                                </span>
+                                <span class="req-item">
+                                    <i class="fas fa-weight"></i> Max 5MB
+                                </span>
+                                <span class="req-item">
+                                    <i class="fas fa-expand-arrows-alt"></i> Min 800x600px
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Jadwal Perjalanan -->
-                <div class="form-section">
-                    <h3 class="subsection-title">
-                        <i class="fas fa-calendar-alt"></i> Jadwal Perjalanan (Itinerary)
-                    </h3>
-                    
-                    <div class="itinerary-builder">
-                        <div class="itinerary-controls">
-                            <button type="button" class="btn-add-day" onclick="addItineraryDay()">
-                                <i class="fas fa-plus"></i> Tambah Hari
-                            </button>
-                            <button type="button" class="btn-reset" onclick="resetItinerary()">
-                                <i class="fas fa-redo"></i> Reset
-                            </button>
-                            <div class="day-counter">0 Hari</div>
-                        </div>
-                        
-                        <div class="itinerary-days" id="itinerary-days">
-                            <!-- Days will be added dynamically -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Daya Tarik Utama -->
-                <div class="form-section">
-                    <h3 class="subsection-title">
-                        <i class="fas fa-star"></i> Daya Tarik Utama
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label for="highlights">
-                            <i class="fas fa-bullhorn"></i> Highlight Paket
-                        </label>
-                        <textarea id="highlights" name="highlights" rows="4" 
-                                  placeholder="Tuliskan daya tarik utama paket ini, pisahkan dengan tanda |
-
-Contoh:
-Candi Borobudur - Warisan Dunia UNESCO | Keraton Yogyakarta - Istana Sultan yang masih aktif | Malioboro Street - Jantung kota Yogyakarta | Kuliner Khas Jogja - Gudeg dan jajanan tradisional"></textarea>
-                        <small class="form-help">
-                            Setiap daya tarik dipisah dengan tanda | (Shift + \)
-                            <br>Contoh: Candi Borobudur | Keraton Yogyakarta | Malioboro Street
-                        </small>
-                    </div>
-                </div>
-
-                <!-- Yang Termasuk dan Tidak Termasuk -->
-                <div class="form-section">
-                    <h3 class="subsection-title">
-                        <i class="fas fa-list-check"></i> Detail Paket
-                    </h3>
-                    
-                    <div class="form-grid-two">
-                        <div class="form-group">
-                            <label for="inclusions">
-                                <i class="fas fa-check-circle" style="color: #28a745;"></i> 
-                                Yang Termasuk
-                            </label>
-                            <textarea id="inclusions" 
-                                      name="inclusions" 
-                                      rows="6" 
-                                      placeholder="Tuliskan apa yang termasuk dalam paket, pisahkan dengan tanda |
-
-Contoh:
-Hotel bintang 3 selama 1 malam | Transportasi mobil ber-AC | Tiket masuk semua tempat wisata | Pemandu wisata berpengalaman | Makan siang 2x | Sarapan 1x | Air mineral selama perjalanan | Asuransi perjalanan"></textarea>
-                            <small class="form-help">Pisahkan setiap item dengan tanda | (Shift + \)</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="exclusions">
-                                <i class="fas fa-times-circle" style="color: #e74c3c;"></i> 
-                                Yang Tidak Termasuk
-                            </label>
-                            <textarea id="exclusions" 
-                                      name="exclusions" 
-                                      rows="6" 
-                                      placeholder="Tuliskan apa yang tidak termasuk dalam paket, pisahkan dengan tanda |
-
-Contoh:
-Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu | Keperluan pribadi lainnya"></textarea>
-                            <small class="form-help">Pisahkan setiap item dengan tanda | (Shift + \)</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tombol Submit -->
+                
+                <!-- Form action buttons dengan style baru -->
                 <div class="form-actions">
-                    <button type="button" class="btn-preview" onclick="previewPackage()">
-                        <i class="fas fa-eye"></i> Preview Paket
+                    <button type="button" class="btn-preview" onclick="previewForm()">
+                        <i class="fas fa-eye"></i> Preview
                     </button>
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-save"></i> Simpan Paket Wisata
+                        <i class="fas fa-save"></i> Simpan Paket
                     </button>
                 </div>
             </form>
@@ -351,9 +282,10 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
         <!-- Daftar Paket -->
         <div class="admin-section">
             <h2 class="section-title">
-                <i class="fas fa-list"></i> Daftar Paket Wisata
+                <i class="fas fa-list"></i>
+                Daftar Paket Wisata
             </h2>
-
+            
             <?php
             $stmt = $koneksi->prepare("SELECT id, nama, deskripsi, fotos FROM paket ORDER BY id DESC");
             $stmt->execute();
@@ -406,7 +338,7 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
         <div class="package-actions">
             <a href="../FrontEnd/html/package_detail.html?id=<?= $row['id'] ?>" 
                class="view-btn" target="_blank">
-                <i class="fas fa-eye"></i> Lihat
+                <i class="fas fa-eye"></i> Lihat Detail
             </a>
             <button type="button" 
                     onclick="openGalleryManage(<?= $row['id'] ?>, '<?= htmlspecialchars($row['nama'], ENT_QUOTES) ?>')" 
@@ -428,6 +360,9 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
                 <i class="fas fa-suitcase-rolling"></i>
                 <h3>Belum Ada Paket Tour</h3>
                 <p>Mulai dengan menambahkan paket wisata pertama Anda.</p>
+                <button class="btn-primary" onclick="document.getElementById('nama').focus();">
+                    <i class="fas fa-plus"></i> Tambah Paket Pertama
+                </button>
             </div>
             <?php endif; 
             $stmt->close();
@@ -1194,462 +1129,221 @@ function showNotification(message, type) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM loaded, setting up events...');
     
-    // File selection for captions
-    const galleryFiles = document.getElementById('galleryFiles');
-    if (galleryFiles) {
-        galleryFiles.addEventListener('change', function() {
-            const files = this.files;
-            const captionsContainer = document.getElementById('galleryCaptions');
-            if (!captionsContainer) return;
-            
-            captionsContainer.innerHTML = '';
-            
-            if (files.length > 0) {
-                const captionsHTML = Array.from(files).map((file, index) => `
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 0.9rem; margin-bottom: 5px; display: block;">Caption untuk "${file.name}":</label>
-                        <input type="text" name="captions[]" 
-                               placeholder="Masukkan caption foto..." 
-                               style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
-                    </div>
-                `).join('');
-                
-                captionsContainer.innerHTML = captionsHTML;
-            }
-        });
-    }
-    
-    // Gallery upload form
-    const galleryUploadForm = document.getElementById('galleryUploadForm');
-    if (galleryUploadForm) {
-        galleryUploadForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const packageId = document.getElementById('galleryPackageId').value;
-            const files = document.getElementById('galleryFiles').files;
-            
-            if (!packageId || files.length === 0) {
-                alert('Package ID dan foto diperlukan');
-                return;
-            }
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-            
-            try {
-                const response = await fetch('upload_additional_photos.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('Foto berhasil diupload!', 'success');
-                    loadGalleryPhotos(packageId);
-                    this.reset();
-                    document.getElementById('galleryCaptions').innerHTML = '';
-                } else {
-                    throw new Error(result.error || 'Upload gagal');
-                }
-                
-            } catch (error) {
-                console.error('Upload error:', error);
-                showNotification('Error: ' + error.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Foto';
-            }
-        });
-    }
-    
-    // Modal close events
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('close')) {
-            closeGalleryModal();
-        }
-        if (e.target && e.target.id === 'galleryManageModal') {
-            closeGalleryModal();
-        }
-    });
-    
-    // Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && window.galleryState.isOpen) {
-            closeGalleryModal();
-        }
-    });
-    
-    // Prevent zoom on double tap
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-        const now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-    
-    // Prevent pull-to-refresh
-    document.body.addEventListener('touchstart', function(e) {
-        if (e.touches.length !== 1) return;
-        
-        const scrollY = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
-        if (scrollY === 0) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    // Smooth scrolling for iOS
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        document.body.style.webkitOverflowScrolling = 'touch';
-    }
-    
-    // Force hardware acceleration on mobile
-    if (window.innerWidth <= 768) {
-        const style = document.createElement('style');
-        style.textContent = `
-            * {
-                -webkit-transform: translateZ(0);
-                transform: translateZ(0);
-                -webkit-backface-visibility: hidden;
-                backface-visibility: hidden;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-});
-
-// Debug function
-window.debugGallery = function() {
-    console.log('🔍 === GALLERY DEBUG ===');
-    console.log('Gallery State:', window.galleryState);
-    
-    const modal = document.getElementById('galleryManageModal');
-    console.log('Modal:', modal ? 'Found' : 'NOT FOUND');
-    console.log('Modal display:', modal ? modal.style.display : 'N/A');
-    
-    const container = document.getElementById('existingPhotos');
-    console.log('Container:', container ? 'Found' : 'NOT FOUND');
-    console.log('Container content length:', container ? container.innerHTML.length : 'N/A');
-    
-    console.log('Window functions:', {
-        openGalleryManage: typeof window.openGalleryManage,
-        closeGalleryModal: typeof window.closeGalleryModal,
-        loadGalleryPhotos: typeof window.loadGalleryPhotos
-    });
-};
-
-// Make functions global
-window.openGalleryManage = openGalleryManage;
-window.closeGalleryModal = closeGalleryModal;
-window.loadGalleryPhotos = loadGalleryPhotos;
-
-console.log('✅ Gallery system initialized');
-
-// Responsive behavior handler
-function handleResponsiveChanges() {
-    const isMobile = window.innerWidth <= 768;
-    const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
-    
-    // Adjust modal for mobile
-    const modal = document.getElementById('galleryManageModal');
-    if (modal && isMobile) {
-        modal.style.padding = '10px 5px';
-    }
-    
-    // Adjust grid columns based on screen size
-    const photoGrid = document.getElementById('existingPhotos');
-    if (photoGrid) {
-        if (window.innerWidth <= 480) {
-            photoGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
-            photoGrid.style.gap = '5px';
-        } else if (window.innerWidth <= 768) {
-            photoGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(110px, 1fr))';
-            photoGrid.style.gap = '8px';
-        } else {
-            photoGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(140px, 1fr))';
-            photoGrid.style.gap = '10px';
-        }
-    }
-    
-    // Adjust form actions for mobile
-    const formActions = document.querySelectorAll('.form-actions');
-    formActions.forEach(action => {
-        if (isMobile) {
-            action.style.flexDirection = 'column';
-            action.style.gap = '10px';
-        } else {
-            action.style.flexDirection = 'row';
-            action.style.gap = '15px';
-        }
-    });
-    
-    // Adjust package grid for mobile
-    const packageGrid = document.querySelector('.packages-grid');
-    if (packageGrid) {
-        if (isMobile) {
-            packageGrid.style.gridTemplateColumns = '1fr';
-        } else if (isTablet) {
-            packageGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
-        } else {
-            packageGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(380px, 1fr))';
-        }
-    }
-}
-
-// Header scroll behavior for mobile
-function handleHeaderScroll() {
+    // Header scroll effect
     const header = document.querySelector('.admin-header');
-    if (!header) return;
-    
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-}
-
-// Touch gesture support for mobile gallery
-function addTouchSupport() {
-    const photoItems = document.querySelectorAll('.photo-management-item');
-    
-    photoItems.forEach(item => {
-        let touchStartY = 0;
-        let touchEndY = 0;
-        
-        item.addEventListener('touchstart', function(e) {
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-        
-        item.addEventListener('touchend', function(e) {
-            touchEndY = e.changedTouches[0].screenY;
-            
-            // Swipe up to show overlay
-            if (touchStartY - touchEndY > 50) {
-                const overlay = this.querySelector('.photo-overlay');
-                if (overlay) {
-                    overlay.style.opacity = '1';
-                    setTimeout(() => {
-                        overlay.style.opacity = '0';
-                    }, 3000);
-                }
-            }
-        }, { passive: true });
-    });
-}
-
-// Virtual keyboard handling for mobile
-function handleVirtualKeyboard() {
-    const viewport = window.visualViewport;
-    
-    if (viewport) {
-        viewport.addEventListener('resize', () => {
-            const modal = document.getElementById('galleryManageModal');
-            if (modal && modal.style.display === 'flex') {
-                const keyboardHeight = window.innerHeight - viewport.height;
-                
-                if (keyboardHeight > 150) {
-                    // Virtual keyboard is open
-                    modal.style.alignItems = 'flex-start';
-                    modal.style.paddingTop = '20px';
-                } else {
-                    // Virtual keyboard is closed
-                    modal.style.alignItems = 'center';
-                    modal.style.paddingTop = '0';
-                }
-            }
-        });
-    }
-}
-
-// Orientation change handler
-function handleOrientationChange() {
-    setTimeout(() => {
-        handleResponsiveChanges();
-        
-        // Force modal reposition on orientation change
-        const modal = document.getElementById('galleryManageModal');
-        if (modal && modal.style.display === 'flex') {
-            modal.style.height = '100vh';
-            modal.style.height = '100dvh'; // Use dynamic viewport height if supported
-        }
-    }, 100);
-}
-
-// Initialize responsive handlers
-function initResponsive() {
-    handleResponsiveChanges();
-    
-    // Add event listeners
-    window.addEventListener('resize', handleResponsiveChanges);
-    window.addEventListener('scroll', handleHeaderScroll);
-    window.addEventListener('orientationchange', handleOrientationChange);
-    
-    // Add touch support
-    setTimeout(addTouchSupport, 1000);
-    
-    // Handle virtual keyboard
-    handleVirtualKeyboard();
-    
-    // Initial header state
-    handleHeaderScroll();
-}
-
-// Update the existing DOMContentLoaded event
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM loaded, setting up events...');
-    
-    // Initialize responsive behavior
-    initResponsive();
-    
-    // File selection for captions
-    const galleryFiles = document.getElementById('galleryFiles');
-    if (galleryFiles) {
-        galleryFiles.addEventListener('change', function() {
-            const files = this.files;
-            const captionsContainer = document.getElementById('galleryCaptions');
-            if (!captionsContainer) return;
-            
-            captionsContainer.innerHTML = '';
-            
-            if (files.length > 0) {
-                const captionsHTML = Array.from(files).map((file, index) => `
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 0.9rem; margin-bottom: 5px; display: block;">Caption untuk "${file.name}":</label>
-                        <input type="text" name="captions[]" 
-                               placeholder="Masukkan caption foto..." 
-                               style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
-                    </div>
-                `).join('');
-                
-                captionsContainer.innerHTML = captionsHTML;
-            }
-        });
-    }
-    
-    // Gallery upload form
-    const galleryUploadForm = document.getElementById('galleryUploadForm');
-    if (galleryUploadForm) {
-        galleryUploadForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const packageId = document.getElementById('galleryPackageId').value;
-            const files = document.getElementById('galleryFiles').files;
-            
-            if (!packageId || files.length === 0) {
-                alert('Package ID dan foto diperlukan');
-                return;
-            }
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-            
-            try {
-                const response = await fetch('upload_additional_photos.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('Foto berhasil diupload!', 'success');
-                    loadGalleryPhotos(packageId);
-                    this.reset();
-                    document.getElementById('galleryCaptions').innerHTML = '';
-                } else {
-                    throw new Error(result.error || 'Upload gagal');
-                }
-                
-            } catch (error) {
-                console.error('Upload error:', error);
-                showNotification('Error: ' + error.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Foto';
-            }
-        });
-    }
-    
-    // Modal close events
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('close')) {
-            closeGalleryModal();
-        }
-        if (e.target && e.target.id === 'galleryManageModal') {
-            closeGalleryModal();
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
         }
     });
     
-    // Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && window.galleryState.isOpen) {
-            closeGalleryModal();
-        }
-    });
-    
-    // Prevent zoom on double tap
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-        const now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-    
-    // Prevent pull-to-refresh
-    document.body.addEventListener('touchstart', function(e) {
-        if (e.touches.length !== 1) return;
-        
-        const scrollY = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
-        if (scrollY === 0) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    // Smooth scrolling for iOS
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        document.body.style.webkitOverflowScrolling = 'touch';
+    // File upload preview
+    const fileInput = document.getElementById('fotos');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            showFilePreview(files);
+        });
     }
     
-    // Force hardware acceleration on mobile
-    if (window.innerWidth <= 768) {
-        const style = document.createElement('style');
-        style.textContent = `
-            * {
-                -webkit-transform: translateZ(0);
-                transform: translateZ(0);
-                -webkit-backface-visibility: hidden;
-                backface-visibility: hidden;
+    // Form validation enhancement
+    const form = document.querySelector('form[action="tambah.php"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateForm(this)) {
+                e.preventDefault();
             }
-        `;
-        document.head.appendChild(style);
+        });
     }
 });
 
-// Update displayGalleryPhotos function to include responsive support
-const originalDisplayGalleryPhotos = displayGalleryPhotos;
-displayGalleryPhotos = function(photos, packageId) {
-    const result = originalDisplayGalleryPhotos(photos, packageId);
+function showFilePreview(files) {
+    const existingPreview = document.querySelector('.file-preview');
+    if (existingPreview) {
+        existingPreview.remove();
+    }
     
-    // Add responsive behavior and touch support after photos are displayed
-    setTimeout(() => {
-        handleResponsiveChanges();
-        addTouchSupport();
-    }, 200);
+    if (files.length === 0) return;
     
-    return result;
-};
+    const previewContainer = document.createElement('div');
+    previewContainer.className = 'file-preview';
+    previewContainer.style.cssText = `
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(52, 152, 219, 0.1);
+        border-radius: 15px;
+        border: 2px dashed #3498db;
+    `;
+    
+    files.forEach((file, index) => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewItem = document.createElement('div');
+                previewItem.style.cssText = `
+                    position: relative;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                `;
+                
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" style="
+                        width: 100%;
+                        height: 80px;
+                        object-fit: cover;
+                        display: block;
+                    ">
+                    <div style="
+                        padding: 8px;
+                        background: white;
+                        font-size: 0.8rem;
+                        text-align: center;
+                        color: #2c3e50;
+                        font-weight: 500;
+                    ">
+                        ${file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name}
+                    </div>
+                    <div style="
+                        position: absolute;
+                        top: 5px;
+                        right: 5px;
+                        background: rgba(52, 152, 219, 0.9);
+                        color: white;
+                        border-radius: 50%;
+                        width: 20px;
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 0.7rem;
+                        font-weight: bold;
+                    ">
+                        ${index + 1}
+                    </div>
+                `;
+                
+                previewContainer.appendChild(previewItem);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    const uploadArea = document.querySelector('.file-upload-area');
+    uploadArea.parentNode.insertBefore(previewContainer, uploadArea.nextSibling);
+}
 
-console.log('🔧 Responsive enhancements loaded');
+function validateForm(form) {
+    const requiredFields = form.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            showFieldError(field, 'Field ini wajib diisi');
+            isValid = false;
+        } else {
+            clearFieldError(field);
+        }
+    });
+    
+    // Validate file count
+    const fileInput = document.getElementById('fotos');
+    if (fileInput && fileInput.files.length < 3) {
+        showFieldError(fileInput, 'Minimal 3 foto diperlukan');
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+function showFieldError(field, message) {
+    clearFieldError(field);
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'field-error';
+    errorDiv.style.cssText = `
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        padding: 5px 10px;
+        background: rgba(231, 76, 60, 0.1);
+        border-radius: 5px;
+        border-left: 3px solid #e74c3c;
+    `;
+    errorDiv.textContent = message;
+    
+    field.style.borderColor = '#e74c3c';
+    field.parentNode.appendChild(errorDiv);
+}
+
+function clearFieldError(field) {
+    const existingError = field.parentNode.querySelector('.field-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    field.style.borderColor = '';
+}
+
+function previewForm() {
+    const formData = new FormData(document.querySelector('form[action="tambah.php"]'));
+    
+    // Show preview modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #2c3e50; font-family: 'Lora', serif;">Preview Paket</h3>
+                <button onclick="this.closest('.modal').remove()" style="
+                    background: #e74c3c;
+                    color: white;
+                    border: none;
+                    border-radius: 50%;
+                    width: 30px;
+                    height: 30px;
+                    cursor: pointer;
+                ">×</button>
+            </div>
+            <div style="space-y: 15px;">
+                <p><strong>Nama:</strong> ${formData.get('nama') || 'Belum diisi'}</p>
+                <p><strong>Durasi:</strong> ${formData.get('duration') || 'Belum dipilih'}</p>
+                <p><strong>Harga:</strong> Rp ${formData.get('price') ? Number(formData.get('price')).toLocaleString('id-ID') : 'Belum diisi'}</p>
+                <p><strong>Deskripsi:</strong> ${formData.get('deskripsi') || 'Belum diisi'}</p>
+                <p><strong>Jumlah Foto:</strong> ${document.getElementById('fotos').files.length} file</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+console.log('🎨 Enhanced admin UI loaded');
 </script>
 
 <!-- Tambahkan tombol debug di bawah header -->
