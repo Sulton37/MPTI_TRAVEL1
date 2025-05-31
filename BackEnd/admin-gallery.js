@@ -1,89 +1,44 @@
 class GalleryManager {
     constructor() {
         this.currentPackageId = null;
+        this.isModalOpen = false;
         this.init();
     }
 
     init() {
+        console.log('🎮 GalleryManager initialized');
         this.bindEvents();
-        this.createModal();
-    }
-
-    createModal() {
-        // Create modal if it doesn't exist
-        if (!document.getElementById('galleryManageModal')) {
-            const modalHTML = `
-                <div id="galleryManageModal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>🖼️ Kelola Gallery - <span id="galleryPackageName"></span></h3>
-                            <button class="close" onclick="closeGalleryModal()">&times;</button>
-                        </div>
-                        
-                        <div class="modal-body">
-                            <!-- Upload Section -->
-                            <div class="gallery-section">
-                                <h4><i class="fas fa-cloud-upload-alt"></i> Upload Foto Baru</h4>
-                                <form id="galleryUploadForm" enctype="multipart/form-data">
-                                    <input type="hidden" id="galleryPackageId" name="package_id">
-                                    
-                                    <div class="form-group">
-                                        <label for="galleryFiles">Pilih Foto (Max 10)</label>
-                                        <input type="file" id="galleryFiles" name="photos[]" multiple accept="image/*" required>
-                                        <small class="form-help">Format: JPG, PNG, WebP | Max 5MB per file</small>
-                                    </div>
-                                    
-                                    <div id="galleryCaptions"></div>
-                                    
-                                    <button type="submit" class="btn-primary">
-                                        <i class="fas fa-upload"></i> Upload Foto
-                                    </button>
-                                </form>
-                            </div>
-                            
-                            <!-- Existing Photos Section -->
-                            <div class="gallery-section">
-                                <h4><i class="fas fa-images"></i> Foto Yang Ada</h4>
-                                <div id="existingPhotos" class="existing-photos-grid">
-                                    <div class="loading">
-                                        <i class="fas fa-spinner fa-spin"></i> Memuat foto...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-        }
     }
 
     bindEvents() {
         // Gallery upload form submission
         document.addEventListener('submit', (e) => {
-            if (e.target.id === 'galleryUploadForm') {
-                e.preventDefault();
+            if (e.target && e.target.id === 'galleryUploadForm') {
                 this.handleGalleryUpload(e);
             }
         });
 
         // Gallery file selection
         document.addEventListener('change', (e) => {
-            if (e.target.id === 'galleryFiles') {
+            if (e.target && e.target.id === 'galleryFiles') {
                 this.handleFileSelection(e);
             }
         });
 
         // Modal close events
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal') || e.target.classList.contains('close')) {
+            if (e.target && e.target.classList.contains('close')) {
+                this.closeGalleryModal();
+            }
+            // Close when clicking outside modal
+            if (e.target && e.target.id === 'galleryManageModal') {
                 this.closeGalleryModal();
             }
         });
 
         // Escape key to close modal
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' && this.isModalOpen) {
                 this.closeGalleryModal();
             }
         });
@@ -92,139 +47,346 @@ class GalleryManager {
     openGalleryManage(packageId, packageName) {
         console.log('🖼️ Opening gallery management for package:', packageId, packageName);
         
+        if (this.isModalOpen) {
+            console.log('⚠️ Modal already open, closing first');
+            this.closeGalleryModal();
+            // Wait a bit before opening again
+            setTimeout(() => {
+                this.openGalleryManage(packageId, packageName);
+            }, 300);
+            return;
+        }
+        
         this.currentPackageId = packageId;
+        this.isModalOpen = true;
         
         // Update modal content
         const packageIdInput = document.getElementById('galleryPackageId');
         const packageNameSpan = document.getElementById('galleryPackageName');
         const modal = document.getElementById('galleryManageModal');
         
-        if (packageIdInput) packageIdInput.value = packageId;
-        if (packageNameSpan) packageNameSpan.textContent = packageName;
-        if (modal) modal.style.display = 'flex';
+        console.log('🔍 Modal elements:', {
+            packageIdInput: !!packageIdInput,
+            packageNameSpan: !!packageNameSpan,
+            modal: !!modal
+        });
+        
+        if (packageIdInput) {
+            packageIdInput.value = packageId;
+            console.log('✅ Package ID set:', packageIdInput.value);
+        }
+        
+        if (packageNameSpan) {
+            packageNameSpan.textContent = packageName;
+            console.log('✅ Package name set:', packageNameSpan.textContent);
+        }
+        
+        if (modal) {
+            // Show modal with animation
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+            console.log('✅ Modal displayed');
+        }
         
         // Load existing photos
         this.loadExistingPhotos(packageId);
         
         // Reset upload form
-        const form = document.getElementById('galleryUploadForm');
-        if (form) {
-            form.reset();
-            document.getElementById('galleryCaptions').innerHTML = '';
-        }
+        this.resetUploadForm();
         
         // Prevent body scroll
         document.body.style.overflow = 'hidden';
+        
+        console.log('🎉 Gallery modal opened successfully');
     }
 
     closeGalleryModal() {
+        console.log('❌ Closing gallery modal');
+        
         const modal = document.getElementById('galleryManageModal');
         if (modal) {
-            modal.style.display = 'none';
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                this.isModalOpen = false;
+                console.log('✅ Modal closed');
+            }, 300);
             document.body.style.overflow = '';
-            this.currentPackageId = null;
+        }
+        
+        this.currentPackageId = null;
+        this.resetUploadForm();
+    }
+
+    resetUploadForm() {
+        const form = document.getElementById('galleryUploadForm');
+        if (form) {
+            form.reset();
+            const captionsContainer = document.getElementById('galleryCaptions');
+            if (captionsContainer) captionsContainer.innerHTML = '';
         }
     }
 
     async loadExistingPhotos(packageId) {
-        const container = document.getElementById('existingPhotos');
-        if (!container) return;
+        console.log('📸 Loading photos for package:', packageId);
         
-        container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat foto...</div>';
+        const container = document.getElementById('existingPhotos');
+        if (!container) {
+            console.error('❌ Container existingPhotos not found!');
+            return;
+        }
+        
+        container.innerHTML = '<div class="loading" style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat foto...</div>';
         
         try {
-            const response = await fetch(`get_gallery_photos.php?package_id=${packageId}`);
-            
+            const response = await fetch(`get_gallery_photos.php?package_id=${packageId}&_t=${Date.now()}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+
+            console.log('📡 Response status:', response.status);
+
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
-            
-            if (result.success) {
-                this.displayExistingPhotos(result.photos, packageId);
-            } else {
-                throw new Error(result.message || 'Failed to load photos');
+            const text = await response.text();
+            console.log('📄 Raw response:', text);
+
+            let photos;
+            try {
+                photos = JSON.parse(text);
+                console.log('🎯 Parsed data:', photos, 'Type:', typeof photos, 'Is array:', Array.isArray(photos));
+            } catch (e) {
+                console.error('❌ JSON parse error:', e);
+                throw new Error('Invalid JSON response');
             }
+
+            if (photos.error) {
+                throw new Error(photos.error);
+            }
+
+            // Process photos
+            const processedPhotos = this.processPhotos(photos, packageId);
+            this.displayExistingPhotos(processedPhotos, packageId);
+
         } catch (error) {
             console.error('❌ Error loading photos:', error);
             container.innerHTML = `
-                <div class="error">
+                <div class="error-state" style="text-align: center; padding: 20px; background: #fee; border-radius: 8px; color: #c33;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Error memuat foto: ${error.message}
-                    <br><button onclick="galleryManager.loadExistingPhotos(${packageId})" class="btn-primary" style="margin-top: 10px;">
-                        <i class="fas fa-sync-alt"></i> Coba Lagi
+                    <p>Error loading photos: ${error.message}</p>
+                    <button onclick="galleryManager.loadExistingPhotos(${packageId})" style="padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">
+                        <i class="fas fa-sync-alt"></i> Retry
                     </button>
                 </div>
             `;
         }
     }
 
+    processPhotos(photos, packageId) {
+        console.log('🔄 Processing photos:', photos);
+        
+        if (!Array.isArray(photos)) {
+            console.warn('⚠️ Photos is not an array:', photos);
+            return [];
+        }
+
+        const galleryPhotos = photos.map((photo, index) => {
+            const protocol = window.location.protocol;
+            const host = window.location.host;
+            const baseUrl = `${protocol}//${host}/MPTI_TRAVEL/BackEnd/uploads/gallery/`;
+            const photoUrl = baseUrl + photo.photo_filename;
+            
+            console.log(`📸 Photo ${index + 1}: ${photo.photo_filename} -> ${photoUrl}`);
+            
+            return {
+                id: photo.id,
+                package_id: photo.package_id,
+                photo_filename: photo.photo_filename,
+                caption: photo.caption || '',
+                photo_order: photo.photo_order || (index + 1),
+                uploaded_at: photo.uploaded_at,
+                url: photoUrl,
+                type: 'gallery'
+            };
+        });
+
+        console.log('✅ Processed gallery photos:', galleryPhotos);
+        return galleryPhotos;
+    }
+
     displayExistingPhotos(photos, packageId) {
+        console.log('🎨 DISPLAY FUNCTION CALLED with photos:', photos);
+        
         const container = document.getElementById('existingPhotos');
-        if (!container) return;
+        if (!container) {
+            console.error('❌ existingPhotos container not found in DOM!');
+            return;
+        }
         
         if (photos.length === 0) {
             container.innerHTML = `
-                <div class="no-photos">
-                    <i class="fas fa-images"></i>
+                <div class="no-photos" style="text-align: center; padding: 30px; color: #666; background: #f8f9fa; border-radius: 12px; border: 2px dashed #dee2e6;">
+                    <i class="fas fa-images" style="font-size: 2rem; color: #3498db; margin-bottom: 10px;"></i>
                     <p>Belum ada foto gallery untuk paket ini.</p>
-                    <small>Upload foto pertama menggunakan form di atas.</small>
+                    <small>Upload foto melalui form di atas untuk menambahkan gallery.</small>
                 </div>
             `;
             return;
         }
         
-        const photosHTML = photos.map(photo => `
-            <div class="photo-management-item" data-photo-id="${photo.id}">
-                <div class="photo-preview">
-                    <img src="${photo.url}" alt="${photo.caption}" loading="lazy" 
-                         onerror="this.src='../../Asset/Package_Culture/borobudur.jpg'">
-                    <div class="photo-overlay">
-                        <button class="btn-edit-photo" onclick="galleryManager.editPhotoCaption(${photo.id}, '${this.escapeHtml(photo.caption)}', this)" title="Edit Caption">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        ${photo.type === 'gallery' ? `
-                            <button class="btn-delete-photo" onclick="galleryManager.deletePhoto(${photo.id}, ${packageId}, this)" title="Hapus Foto">
+        console.log(`📸 Creating HTML for ${photos.length} photos...`);
+        
+        const photosHTML = photos.map((photo, index) => {
+            console.log(`🖼️ Processing photo ${index + 1}:`, photo);
+            
+            return `
+                <div class="photo-management-item" data-photo-id="${photo.id}">
+                    <div class="photo-preview">
+                        <img src="${photo.url}" 
+                             alt="${this.escapeHtml(photo.caption)}" 
+                             loading="lazy" 
+                             style="cursor: pointer;"
+                             onclick="galleryManager.previewPhoto('${photo.url}', '${this.escapeHtml(photo.caption)}')"
+                             onerror="console.log('❌ Image failed to load:', this.src); this.src='../../Asset/Package_Culture/borobudur.jpg'; this.style.opacity='0.7';">
+                        <div class="photo-overlay">
+                            <button class="btn-edit-photo" 
+                                    onclick="galleryManager.editPhotoCaption(${photo.id}, '${this.escapeHtml(photo.caption)}', this)" 
+                                    title="Edit Caption">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete-photo" 
+                                    onclick="galleryManager.deletePhoto(${photo.id}, ${packageId}, this)" 
+                                    title="Hapus Foto">
                                 <i class="fas fa-trash"></i>
                             </button>
-                        ` : `
-                            <span class="main-photo-badge">Foto Utama</span>
-                        `}
+                        </div>
                     </div>
-                </div>
-                <div class="photo-info">
-                    <div class="photo-caption" id="caption-${photo.id}">${photo.caption || 'Tanpa caption'}</div>
-                    <div class="photo-meta">
-                        <small>
-                            ${photo.type === 'main' ? '📸 Foto Utama' : '🖼️ Gallery'} | 
-                            Order: ${photo.photo_order} | 
-                            ${this.formatDate(photo.uploaded_at)}
-                        </small>
-                    </div>
-                    ${photo.type === 'gallery' ? `
+                    <div class="photo-info">
+                        <div class="photo-caption" id="caption-${photo.id}" title="${this.escapeHtml(photo.caption)}">
+                            ${this.truncateText(photo.caption || 'Tanpa caption', 20)}
+                        </div>
+                        <div class="photo-meta">
+                            <small>
+                                🖼️ Gallery | Order: ${photo.photo_order} <br>
+                                ${this.formatDate(photo.uploaded_at)}
+                            </small>
+                        </div>
                         <div class="photo-actions">
                             <button onclick="galleryManager.movePhoto(${photo.id}, ${packageId}, 'up')" 
                                     class="btn-move-up" title="Pindah ke atas">
-                                <i class="fas fa-arrow-up"></i>
+                                <i class="fas fa-arrow-up"></i> Up
                             </button>
                             <button onclick="galleryManager.movePhoto(${photo.id}, ${packageId}, 'down')" 
                                     class="btn-move-down" title="Pindah ke bawah">
-                                <i class="fas fa-arrow-down"></i>
+                                <i class="fas fa-arrow-down"></i> Down
                             </button>
                         </div>
-                    ` : ''}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
         container.innerHTML = photosHTML;
+        console.log('✅ Photos displayed successfully!');
+        
+        // Verify in DOM
+        const photoItems = container.querySelectorAll('.photo-management-item');
+        console.log('🔍 Photo items found in DOM:', photoItems.length);
+    }
+
+    // Helper methods
+    truncateText(text, maxLength) {
+        if (!text) return 'Tanpa caption';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
     }
 
     escapeHtml(text) {
         const div = document.createElement('div');
-        div.textContent = text;
+        div.textContent = text || '';
         return div.innerHTML.replace(/'/g, '&#39;');
+    }
+
+    formatDate(dateString) {
+        if (!dateString) return 'Tidak diketahui';
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return 'Format tanggal tidak valid';
+        }
+    }
+
+    previewPhoto(imageUrl, caption) {
+        const lightbox = document.createElement('div');
+        lightbox.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            cursor: pointer;
+        `;
+        
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.cssText = `
+            max-width: 90%;
+            max-height: 80%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        `;
+        
+        const captionElement = document.createElement('div');
+        captionElement.textContent = caption || 'Tanpa caption';
+        captionElement.style.cssText = `
+            color: white;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            max-width: 600px;
+        `;
+        
+        const closeHint = document.createElement('div');
+        closeHint.textContent = 'Klik untuk menutup';
+        closeHint.style.cssText = `
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        `;
+        
+        lightbox.appendChild(img);
+        lightbox.appendChild(captionElement);
+        lightbox.appendChild(closeHint);
+        
+        lightbox.onclick = () => {
+            lightbox.remove();
+            document.body.style.overflow = '';
+        };
+        
+        document.body.appendChild(lightbox);
+        document.body.style.overflow = 'hidden';
     }
 
     handleFileSelection(event) {
@@ -235,26 +397,16 @@ class GalleryManager {
         captionsContainer.innerHTML = '';
         
         if (files.length > 0) {
-            if (files.length > 10) {
-                alert('⚠️ Maksimal 10 foto yang dapat diupload sekaligus');
-                event.target.value = '';
-                return;
-            }
+            const captionsHTML = Array.from(files).map((file, index) => `
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="caption_${index}" style="font-size: 0.9rem; margin-bottom: 5px;">Caption untuk "${file.name}":</label>
+                    <input type="text" id="caption_${index}" name="captions[]" 
+                           placeholder="Masukkan caption foto..." 
+                           style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                </div>
+            `).join('');
             
-            captionsContainer.innerHTML = '<h5><i class="fas fa-pen"></i> Caption untuk setiap foto:</h5>';
-            
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const captionDiv = document.createElement('div');
-                captionDiv.className = 'form-group';
-                captionDiv.innerHTML = `
-                    <label for="caption-${i}">Caption untuk "${file.name}"</label>
-                    <input type="text" id="caption-${i}" name="captions[]" 
-                           placeholder="Deskripsi foto ini..." 
-                           maxlength="255">
-                `;
-                captionsContainer.appendChild(captionDiv);
-            }
+            captionsContainer.innerHTML = captionsHTML;
         }
     }
 
@@ -265,7 +417,7 @@ class GalleryManager {
         const files = document.getElementById('galleryFiles').files;
         
         if (!packageId || files.length === 0) {
-            this.showNotification('❌ Harap pilih foto untuk diupload', 'error');
+            alert('Package ID dan foto diperlukan');
             return;
         }
         
@@ -284,20 +436,17 @@ class GalleryManager {
             const result = await response.json();
             
             if (result.success) {
-                this.showNotification('✅ ' + result.message, 'success');
-                
-                // Reset form
+                this.showNotification('Foto berhasil diupload!', 'success');
+                this.loadExistingPhotos(packageId);
                 event.target.reset();
                 document.getElementById('galleryCaptions').innerHTML = '';
-                
-                // Reload photos
-                this.loadExistingPhotos(packageId);
             } else {
-                throw new Error(result.message || 'Upload gagal');
+                throw new Error(result.error || 'Upload gagal');
             }
+            
         } catch (error) {
             console.error('❌ Upload error:', error);
-            this.showNotification('❌ ' + error.message, 'error');
+            this.showNotification('Error: ' + error.message, 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Foto';
@@ -308,204 +457,239 @@ class GalleryManager {
         const captionElement = document.getElementById(`caption-${photoId}`);
         if (!captionElement) return;
         
-        const currentText = currentCaption || '';
-        
-        const wrapper = document.createElement('div');
-        wrapper.style.display = 'flex';
-        wrapper.style.alignItems = 'center';
-        wrapper.style.gap = '5px';
-        
         const input = document.createElement('input');
         input.type = 'text';
-        input.value = currentText;
-        input.style.flex = '1';
-        input.style.padding = '5px';
-        input.style.border = '1px solid #ddd';
-        input.style.borderRadius = '4px';
+        input.value = currentCaption;
+        input.style.cssText = `
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        `;
         
         const saveBtn = document.createElement('button');
-        saveBtn.innerHTML = '<i class="fas fa-save"></i>';
-        saveBtn.className = 'btn-primary';
-        saveBtn.style.padding = '5px 8px';
-        saveBtn.style.minWidth = 'auto';
+        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+        saveBtn.style.cssText = `
+            margin-left: 3px;
+            padding: 3px 6px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        `;
         
         const cancelBtn = document.createElement('button');
         cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
-        cancelBtn.className = 'btn-secondary';
-        cancelBtn.style.padding = '5px 8px';
-        cancelBtn.style.minWidth = 'auto';
+        cancelBtn.style.cssText = `
+            margin-left: 3px;
+            padding: 3px 6px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        `;
         
-        wrapper.appendChild(input);
-        wrapper.appendChild(saveBtn);
-        wrapper.appendChild(cancelBtn);
+        const originalContent = captionElement.innerHTML;
         
         captionElement.innerHTML = '';
-        captionElement.appendChild(wrapper);
-        input.focus();
+        captionElement.appendChild(input);
+        captionElement.appendChild(saveBtn);
+        captionElement.appendChild(cancelBtn);
         
-        saveBtn.onclick = () => this.savePhotoCaption(photoId, input.value, captionElement);
+        input.focus();
+        input.select();
+        
+        saveBtn.onclick = () => this.savePhotoCaption(photoId, input.value, captionElement, originalContent);
         cancelBtn.onclick = () => {
-            captionElement.textContent = currentText || 'Tanpa caption';
+            captionElement.innerHTML = originalContent;
         };
         
         input.onkeypress = (e) => {
             if (e.key === 'Enter') {
-                this.savePhotoCaption(photoId, input.value, captionElement);
+                this.savePhotoCaption(photoId, input.value, captionElement, originalContent);
             } else if (e.key === 'Escape') {
-                captionElement.textContent = currentText || 'Tanpa caption';
+                captionElement.innerHTML = originalContent;
             }
         };
     }
 
-    async savePhotoCaption(photoId, newCaption, captionElement) {
+    async savePhotoCaption(photoId, newCaption, captionElement, originalContent) {
         try {
-            const formData = new FormData();
-            formData.append('photo_id', photoId);
-            formData.append('caption', newCaption);
-            
             const response = await fetch('update_photo_caption.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    photo_id: photoId,
+                    caption: newCaption
+                })
             });
             
             const result = await response.json();
             
             if (result.success) {
-                captionElement.textContent = newCaption || 'Tanpa caption';
-                this.showNotification('✅ Caption berhasil diupdate', 'success');
+                captionElement.innerHTML = this.truncateText(newCaption || 'Tanpa caption', 20);
+                captionElement.title = newCaption;
+                this.showNotification('Caption berhasil diupdate!', 'success');
             } else {
-                throw new Error(result.message);
+                throw new Error(result.message || 'Gagal update caption');
             }
+            
         } catch (error) {
             console.error('❌ Error updating caption:', error);
-            this.showNotification('❌ Gagal update caption: ' + error.message, 'error');
-            captionElement.textContent = 'Error updating caption';
+            captionElement.innerHTML = originalContent;
+            this.showNotification('Error: ' + error.message, 'error');
         }
     }
 
     async deletePhoto(photoId, packageId, buttonElement) {
-        if (!confirm('❓ Apakah Anda yakin ingin menghapus foto ini?')) {
+        if (!confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
             return;
         }
         
-        const photoItem = buttonElement.closest('.photo-management-item');
-        photoItem.style.opacity = '0.5';
-        
         try {
-            const formData = new FormData();
-            formData.append('photo_id', photoId);
-            formData.append('package_id', packageId);
-            
             const response = await fetch('delete_gallery_photo.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `photo_id=${photoId}&package_id=${packageId}`
             });
             
             const result = await response.json();
             
             if (result.success) {
-                photoItem.remove();
-                this.showNotification('✅ ' + result.message, 'success');
+                this.showNotification('Foto berhasil dihapus!', 'success');
+                this.loadExistingPhotos(packageId);
             } else {
-                throw new Error(result.message);
+                throw new Error(result.message || 'Gagal menghapus foto');
             }
+            
         } catch (error) {
             console.error('❌ Error deleting photo:', error);
-            photoItem.style.opacity = '1';
-            this.showNotification('❌ Gagal hapus foto: ' + error.message, 'error');
+            this.showNotification('Error: ' + error.message, 'error');
         }
     }
 
     async movePhoto(photoId, packageId, direction) {
         try {
-            const formData = new FormData();
-            formData.append('photo_id', photoId);
-            formData.append('package_id', packageId);
-            formData.append('direction', direction);
-            
             const response = await fetch('move_photo_order.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `photo_id=${photoId}&package_id=${packageId}&direction=${direction}`
             });
             
             const result = await response.json();
             
             if (result.success) {
-                this.showNotification(`✅ Foto berhasil dipindah ke ${direction === 'up' ? 'atas' : 'bawah'}`, 'success');
-                this.loadExistingPhotos(packageId); // Reload to show new order
+                this.showNotification(`Foto berhasil dipindah ${direction === 'up' ? 'ke atas' : 'ke bawah'}!`, 'success');
+                this.loadExistingPhotos(packageId);
             } else {
-                throw new Error(result.message);
+                throw new Error(result.message || 'Gagal memindah foto');
             }
+            
         } catch (error) {
             console.error('❌ Error moving photo:', error);
-            this.showNotification('❌ Gagal pindah foto: ' + error.message, 'error');
+            this.showNotification('Error: ' + error.message, 'error');
         }
     }
 
-    formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
-
     showNotification(message, type) {
-        // Remove existing notification
-        const existing = document.querySelector('.gallery-notification');
-        if (existing) existing.remove();
-        
         const notification = document.createElement('div');
-        notification.className = `gallery-notification ${type}`;
-        notification.textContent = message;
         notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
-            background: ${type === 'success' ? '#28a745' : '#dc3545'};
-            color: white;
+            padding: 12px 20px;
             border-radius: 8px;
-            z-index: 10001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
             opacity: 0;
             transform: translateX(100%);
             transition: all 0.3s ease;
-            max-width: 350px;
+            max-width: 300px;
             word-wrap: break-word;
+            font-size: 0.9rem;
+        `;
+        
+        if (type === 'success') {
+            notification.style.background = '#27ae60';
+        } else {
+            notification.style.background = '#e74c3c';
+        }
+        
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i>
+            ${message}
         `;
         
         document.body.appendChild(notification);
         
-        // Animate in
-        requestAnimationFrame(() => {
+        setTimeout(() => {
             notification.style.opacity = '1';
             notification.style.transform = 'translateX(0)';
-        });
+        }, 100);
         
-        // Animate out
         setTimeout(() => {
             notification.style.opacity = '0';
             notification.style.transform = 'translateX(100%)';
-            setTimeout(() => notification.remove(), 300);
-        }, 4000);
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Debug function
+    debugGalleryState() {
+        console.log('🔍 === GALLERY DEBUG ===');
+        
+        const modal = document.getElementById('galleryManageModal');
+        console.log('📱 Modal:', modal ? 'Found' : 'NOT FOUND');
+        console.log('📱 Modal display:', modal ? modal.style.display : 'N/A');
+        console.log('📱 Modal classes:', modal ? modal.className : 'N/A');
+        
+        const container = document.getElementById('existingPhotos');
+        console.log('📦 Container:', container ? 'Found' : 'NOT FOUND');
+        console.log('📦 Container innerHTML length:', container ? container.innerHTML.length : 'N/A');
+        
+        console.log('🎮 Gallery Manager:', this);
+        console.log('🆔 Current Package ID:', this.currentPackageId);
+        console.log('🚪 Modal Open:', this.isModalOpen);
     }
 }
 
 // Initialize gallery manager when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Initializing GalleryManager...');
     window.galleryManager = new GalleryManager();
 });
 
 // Global functions for backward compatibility
 function openGalleryManage(packageId, packageName) {
+    console.log('🌍 Global openGalleryManage called:', packageId, packageName);
+    
     if (window.galleryManager) {
         window.galleryManager.openGalleryManage(packageId, packageName);
     } else {
         console.error('❌ Gallery manager not initialized');
+        
+        // Try to initialize if not ready
+        setTimeout(() => {
+            if (window.galleryManager) {
+                window.galleryManager.openGalleryManage(packageId, packageName);
+            } else {
+                alert('Gallery system belum siap. Silakan refresh halaman.');
+            }
+        }, 500);
     }
 }
 
@@ -514,3 +698,12 @@ function closeGalleryModal() {
         window.galleryManager.closeGalleryModal();
     }
 }
+
+// Debug function
+window.debugGallery = function() {
+    if (window.galleryManager) {
+        window.galleryManager.debugGalleryState();
+    } else {
+        console.log('❌ Gallery manager not found');
+    }
+};

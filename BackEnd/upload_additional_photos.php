@@ -8,7 +8,14 @@ ob_start();
 
 session_start();
 
-// Bersihkan buffer dan set header JSON
+// Check admin authentication
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    ob_end_clean();
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized access']);
+    exit;
+}
+
 ob_end_clean();
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
@@ -96,7 +103,7 @@ try {
             
             // Move uploaded file
             if (move_uploaded_file($tempName, $filePath)) {
-                // Insert into database
+                // Insert into database with correct column name
                 $caption = isset($captions[$i]) ? trim($captions[$i]) : '';
                 $photoOrder = $currentMaxOrder + $i + 1;
                 
@@ -106,7 +113,7 @@ try {
                 if ($stmt->execute()) {
                     $uploadedFiles[] = $filename;
                 } else {
-                    $errors[] = "Database error for $originalName";
+                    $errors[] = "Database error for $originalName: " . $stmt->error;
                     // Delete uploaded file if database insert failed
                     unlink($filePath);
                 }

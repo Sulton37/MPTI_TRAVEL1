@@ -15,9 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Get JSON input
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!$input) {
+    // Try form data
+    $input = $_POST;
+}
+
 try {
-    $photo_id = filter_input(INPUT_POST, 'photo_id', FILTER_VALIDATE_INT);
-    $caption = trim($_POST['caption'] ?? '');
+    $photo_id = filter_var($input['photo_id'] ?? null, FILTER_VALIDATE_INT);
+    $caption = trim($input['caption'] ?? '');
     
     if (!$photo_id || $photo_id <= 0) {
         throw new Exception('Invalid photo ID');
@@ -30,7 +38,8 @@ try {
 
     $koneksi->set_charset("utf8mb4");
 
-    $stmt = $koneksi->prepare("UPDATE package_gallery SET photo_caption = ? WHERE id = ?");
+    // Use correct column name 'caption'
+    $stmt = $koneksi->prepare("UPDATE package_gallery SET caption = ? WHERE id = ?");
     $stmt->bind_param("si", $caption, $photo_id);
     
     if ($stmt->execute()) {
@@ -44,7 +53,7 @@ try {
             throw new Exception('Photo not found or no changes made');
         }
     } else {
-        throw new Exception('Failed to update caption');
+        throw new Exception('Failed to update caption: ' . $stmt->error);
     }
 
     $stmt->close();

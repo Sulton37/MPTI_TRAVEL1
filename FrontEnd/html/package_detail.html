@@ -184,21 +184,44 @@
             showLoading();
             
             try {
-                const response = await fetch(`../../BackEnd/get_package_detail.php?id=${id}`);
+                // Try direct path first
+                let response = await fetch(`../../BackEnd/get_package_detail.php?id=${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
                 console.log('📡 Response status:', response.status);
+                
+                if (!response.ok) {
+                    // If that fails, try absolute path
+                    const protocol = window.location.protocol;
+                    const host = window.location.host;
+                    const absoluteUrl = `${protocol}//${host}/MPTI_TRAVEL/BackEnd/get_package_detail.php?id=${id}`;
+                    
+                    console.log('🔄 Trying absolute URL:', absoluteUrl);
+                    response = await fetch(absoluteUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+                }
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('📦 Package data received:', data);
                 
-                if (data.error) {
-                    throw new Error(data.error);
+                if (data.success) {
+                    displayPackageDetail(data);
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
                 }
-                
-                displayPackageDetail(data);
                 
             } catch (error) {
                 console.error('❌ Error loading package detail:', error);

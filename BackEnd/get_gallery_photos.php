@@ -1,13 +1,5 @@
 <?php
-session_start();
-
-// Check admin authentication
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-    exit;
-}
-
+// filepath: c:\xampp\htdocs\MPTI_TRAVEL\BackEnd\get_gallery_photos.php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
@@ -47,8 +39,8 @@ try {
     }
     $checkStmt->close();
     
-    // Get gallery photos
-    $stmt = $koneksi->prepare("SELECT id, package_id, photo_filename, caption, photo_order, created_at FROM package_gallery WHERE package_id = ? ORDER BY photo_order ASC, id ASC");
+    // Get gallery photos with correct column names
+    $stmt = $koneksi->prepare("SELECT id, package_id, photo_filename, caption, photo_order, uploaded_at FROM package_gallery WHERE package_id = ? ORDER BY photo_order ASC, id ASC");
     $stmt->bind_param("i", $package_id);
     
     if (!$stmt->execute()) {
@@ -67,7 +59,7 @@ try {
             'photo_filename' => $row['photo_filename'],
             'caption' => $row['caption'] ?: '',
             'photo_order' => (int)$row['photo_order'],
-            'created_at' => $row['created_at']
+            'uploaded_at' => $row['uploaded_at']
         ];
     }
     

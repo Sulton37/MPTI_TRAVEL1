@@ -101,11 +101,50 @@ if (isset($_GET['hapus'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ganti meta viewport dengan yang lebih comprehensive -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#3498db">
     <title>Admin Panel | Vacationland</title>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="admin-styles.css?v=<?= time() ?>">
+
+    <!-- Tambahkan CSS inline di head untuk override semua CSS -->
+    <style>
+/* Force modal visibility */
+#galleryManageModal {
+    font-family: 'Roboto', sans-serif !important;
+    box-sizing: border-box !important;
+}
+
+#galleryManageModal * {
+    box-sizing: border-box !important;
+}
+
+#galleryManageModal .modal-content {
+    position: relative !important;
+    z-index: 1000000 !important;
+}
+
+/* Force grid visibility */
+#existingPhotos {
+    display: grid !important;
+    visibility: visible !important;
+}
+
+#existingPhotos .photo-item {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+/* Debug styling */
+.photo-item {
+    border: 2px solid red !important; /* Temporary debug border */
+}
+</style>
 </head>
 <body>
     <header class="admin-header">
@@ -396,678 +435,1228 @@ Tiket pesawat ke Yogyakarta | Makan malam | Belanja pribadi | Tips untuk pemandu
         </div>
     </div>
 
-    <!-- Gallery Management Modal -->
-    <div id="galleryManageModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 900px;">
-            <div class="modal-header">
-                <h3><i class="fas fa-images"></i> Kelola Gallery: <span id="galleryPackageName"></span></h3>
-                <span class="close" onclick="closeGalleryModal()">&times;</span>
+    <!-- Gallery Management Modal - PERBAIKAN LENGKAP -->
+    <div id="galleryManageModal" style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.8);
+        z-index: 999999;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(3px);
+    ">
+        <div class="modal-content" style="
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin: auto;
+        ">
+            <div class="modal-header" style="
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-radius: 15px 15px 0 0;
+                flex-shrink: 0;
+            ">
+                <h3 style="
+                    margin: 0;
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <i class="fas fa-images"></i> 
+                    Gallery: <span id="galleryPackageName">-</span>
+                </h3>
+                <button class="close" onclick="closeGalleryModal()" style="
+                    background: rgba(255,255,255,0.2);
+                    border: none;
+                    color: white;
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.1rem;
+                ">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <!-- Upload New Photos Section -->
-                <div class="gallery-section">
-                    <h4><i class="fas fa-plus"></i> Tambah Foto Baru</h4>
+            
+            <div class="modal-body" style="
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+                background: #f8f9fa;
+            ">
+                <!-- Upload Section -->
+                <div style="
+                    background: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin-bottom: 20px;
+                    border: 1px solid #e9ecef;
+                ">
+                    <h4 style="
+                        margin: 0 0 10px 0;
+                        color: #2c3e50;
+                        font-size: 0.95rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    ">
+                        <i class="fas fa-upload"></i> Upload Foto Baru
+                    </h4>
+                    
                     <form id="galleryUploadForm" enctype="multipart/form-data">
                         <input type="hidden" id="galleryPackageId" name="package_id">
                         
-                        <div class="form-group">
-                            <label for="galleryFiles">Pilih Foto untuk ditambahkan:</label>
-                            <input type="file" id="galleryFiles" name="photos[]" accept="image/*" multiple>
-                            <small>Maksimal 10 foto, ukuran maksimal 5MB per foto</small>
+                        <div style="margin-bottom: 10px;">
+                            <label style="
+                                font-size: 0.8rem;
+                                margin-bottom: 5px;
+                                display: block;
+                                color: #555;
+                            ">Pilih Foto (Max 10 files, 5MB each):</label>
+                            <input type="file" 
+                                   id="galleryFiles" 
+                                   name="photos[]" 
+                                   multiple 
+                                   accept="image/*" 
+                                   required
+                                   style="
+                                       padding: 8px;
+                                       border: 2px dashed #3498db;
+                                       border-radius: 6px;
+                                       background: white;
+                                       width: 100%;
+                                       box-sizing: border-box;
+                                   ">
                         </div>
                         
-                        <div id="galleryCaptions" class="photo-captions"></div>
+                        <div id="galleryCaptions" style="margin-bottom: 10px;"></div>
                         
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" style="
+                            background: #3498db;
+                            color: white;
+                            padding: 8px 16px;
+                            border: none;
+                            border-radius: 6px;
+                            font-weight: 600;
+                            font-size: 0.9rem;
+                            cursor: pointer;
+                            transition: background 0.3s ease;
+                        ">
                             <i class="fas fa-upload"></i> Upload Foto
                         </button>
                     </form>
                 </div>
                 
-                <hr style="margin: 30px 0;">
-                
-                <!-- Existing Photos Management -->
-                <div class="gallery-section">
-                    <h4><i class="fas fa-edit"></i> Foto yang Ada</h4>
-                    <div id="existingPhotos" class="existing-photos-grid">
-                        <!-- Photos will be loaded here -->
+                <!-- Photos Grid Section -->
+                <div style="
+                    background: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    border: 1px solid #e9ecef;
+                ">
+                    <h4 style="
+                        margin: 0 0 15px 0;
+                        color: #2c3e50;
+                        font-size: 0.95rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    ">
+                        <i class="fas fa-photo-video"></i> Foto yang Ada
+                    </h4>
+                    
+                    <div id="existingPhotos" style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                        gap: 10px;
+                        min-height: 150px;
+                        background: #f8f9fa;
+                        padding: 15px;
+                        border-radius: 8px;
+                        border: 1px solid #e9ecef;
+                    ">
+                        <div style="
+                            grid-column: 1 / -1;
+                            text-align: center;
+                            padding: 20px;
+                            color: #666;
+                        ">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
+                            <p style="margin: 0; font-size: 0.9rem;">Memuat foto gallery...</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="admin-gallery.js"></script>
     <script>
-// Gallery management functions - Fixed version
-let galleryManager = {
+console.log('🚀 Admin script loaded');
+
+// Simple gallery manager - NO CLASSES
+window.galleryState = {
+    isOpen: false,
     currentPackageId: null,
-    currentPackageName: '',
-    
-    openGalleryManage: function(packageId, packageName) {
-        this.currentPackageId = packageId;
-        this.currentPackageName = packageName;
-        
-        // Set modal content
-        document.getElementById('galleryPackageId').value = packageId;
-        document.getElementById('galleryPackageName').textContent = packageName;
-        
-        // Load existing photos
-        this.loadExistingPhotos(packageId);
-        
-        // Show modal
-        document.getElementById('galleryManageModal').style.display = 'block';
-    },
-    
-    closeGalleryModal: function() {
-        document.getElementById('galleryManageModal').style.display = 'none';
-        this.currentPackageId = null;
-        this.currentPackageName = '';
-        
-        // Clear file input
-        document.getElementById('galleryFiles').value = '';
-        document.getElementById('galleryCaptions').innerHTML = '';
-    },
-    
-    loadExistingPhotos: function(packageId) {
-        const container = document.getElementById('existingPhotos');
-        container.innerHTML = '<p class="loading">Loading photos...</p>';
-        
-        fetch(`get_gallery_photos.php?package_id=${encodeURIComponent(packageId)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text(); // Get as text first for debugging
-            })
-            .then(text => {
-                console.log('Raw response:', text); // Debug log
-                
-                // Try to parse JSON
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    throw new Error('Invalid JSON response: ' + text);
-                }
-                
-                console.log('Parsed data:', data, 'Type:', typeof data, 'Is array:', Array.isArray(data)); // Debug log
-                
-                // Handle error response
-                if (data && data.error) {
-                    container.innerHTML = `<p class="error">Error loading photos: ${data.error}</p>`;
-                    return;
-                }
-                
-                // Ensure we have an array
-                if (!Array.isArray(data)) {
-                    console.error('Expected array, got:', typeof data, data);
-                    
-                    // If it's an object with photos property, use that
-                    if (data && typeof data === 'object' && Array.isArray(data.photos)) {
-                        data = data.photos;
-                    } else {
-                        container.innerHTML = '<p class="error">Invalid data format received</p>';
-                        return;
-                    }
-                }
-                
-                // Handle empty array
-                if (data.length === 0) {
-                    container.innerHTML = '<p class="no-photos">Belum ada foto gallery untuk paket ini.</p>';
-                    return;
-                }
-                
-                // Render photos
-                container.innerHTML = data.map(photo => {
-                    // Ensure all required properties exist
-                    const id = photo.id || 0;
-                    const filename = photo.photo_filename || '';
-                    const caption = photo.caption || '';
-                    const order = photo.photo_order || 0;
-                    
-                    return `
-                        <div class="photo-item" data-photo-id="${id}">
-                            <div class="photo-wrapper">
-                                <img src="uploads/gallery/${filename}" 
-                                     alt="${caption}"
-                                     onerror="this.src='../Asset/Package_Culture/borobudur.jpg'">
-                                <div class="photo-overlay">
-                                    <button class="btn-edit-caption" onclick="galleryManager.editCaption(${id}, '${caption.replace(/'/g, '\\\'')}')" title="Edit Caption">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-move-up" onclick="galleryManager.movePhoto(${id}, 'up')" title="Move Up">
-                                        <i class="fas fa-arrow-up"></i>
-                                    </button>
-                                    <button class="btn-move-down" onclick="galleryManager.movePhoto(${id}, 'down')" title="Move Down">
-                                        <i class="fas fa-arrow-down"></i>
-                                    </button>
-                                    <button class="btn-delete-photo" onclick="galleryManager.deletePhoto(${id})" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="photo-caption">
-                                <span class="caption-text">${caption || 'No caption'}</span>
-                                <span class="photo-order">Order: ${order}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            })
-            .catch(error => {
-                console.error('Error loading photos:', error);
-                container.innerHTML = `<p class="error">Error loading photos: ${error.message}</p>`;
-            });
-    },
-    
-    editCaption: function(photoId, currentCaption) {
-        const newCaption = prompt('Edit caption:', currentCaption);
-        if (newCaption !== null && newCaption !== currentCaption) {
-            fetch('update_photo_caption.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    photo_id: photoId,
-                    caption: newCaption
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.loadExistingPhotos(this.currentPackageId);
-                } else {
-                    alert('Error updating caption: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error updating caption:', error);
-                alert('Error updating caption');
-            });
-        }
-    },
-    
-    movePhoto: function(photoId, direction) {
-        fetch('move_photo_order.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                photo_id: photoId,
-                direction: direction
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                this.loadExistingPhotos(this.currentPackageId);
-            } else {
-                alert('Error moving photo: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error moving photo:', error);
-            alert('Error moving photo');
-        });
-    },
-    
-    deletePhoto: function(photoId) {
-        if (confirm('Are you sure you want to delete this photo?')) {
-            fetch('delete_gallery_photo.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    photo_id: photoId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.loadExistingPhotos(this.currentPackageId);
-                } else {
-                    alert('Error deleting photo: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting photo:', error);
-                alert('Error deleting photo');
-            });
-        }
-    }
+    currentPackageName: ''
 };
 
-// Gallery upload form handler
-document.addEventListener('DOMContentLoaded', function() {
-    const galleryUploadForm = document.getElementById('galleryUploadForm');
-    const galleryFiles = document.getElementById('galleryFiles');
-    const galleryCaptions = document.getElementById('galleryCaptions');
-    
-    // Handle file selection for captions
-    galleryFiles.addEventListener('change', function() {
-        const files = this.files;
-        galleryCaptions.innerHTML = '';
-        
-        for (let i = 0; i < files.length; i++) {
-            const captionDiv = document.createElement('div');
-            captionDiv.className = 'caption-input-group';
-            captionDiv.innerHTML = `
-                <label>Caption for ${files[i].name}:</label>
-                <input type="text" name="captions[]" placeholder="Enter caption for this photo">
-            `;
-            galleryCaptions.appendChild(captionDiv);
-        }
-    });
-    
-    // Handle gallery upload form submission
-    galleryUploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const files = galleryFiles.files;
-        
-        if (files.length === 0) {
-            alert('Please select at least one photo to upload');
-            return;
-        }
-        
-        if (files.length > 10) {
-            alert('Maximum 10 photos allowed');
-            return;
-        }
-        
-        // Check file sizes
-        for (let file of files) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                alert(`File ${file.name} is too large. Maximum size is 5MB`);
-                return;
-            }
-        }
-        
-        fetch('upload_additional_photos.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Photos uploaded successfully!');
-                galleryFiles.value = '';
-                galleryCaptions.innerHTML = '';
-                galleryManager.loadExistingPhotos(galleryManager.currentPackageId);
-            } else {
-                alert('Error uploading photos: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error uploading photos:', error);
-            alert('Error uploading photos');
-        });
-    });
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('galleryManageModal');
-        if (event.target === modal) {
-            galleryManager.closeGalleryModal();
-        }
-    });
-});
-
-// Make galleryManager available globally
-window.galleryManager = galleryManager;
-
-// Fix the global functions to use galleryManager
+// Simple modal functions
 function openGalleryManage(packageId, packageName) {
-    galleryManager.openGalleryManage(packageId, packageName);
-}
-
-function closeGalleryModal() {
-    galleryManager.closeGalleryModal();
-}
-
-// Itinerary Management Functions
-let dayCount = 0;
-
-function updateItineraryDays() {
-    const durationSelect = document.getElementById('duration');
-    const selectedDuration = durationSelect.value;
+    console.log('🖼️ Opening gallery for package:', packageId, packageName);
     
-    // Extract number of days from duration (e.g., "2D1N" -> 2)
-    const days = parseInt(selectedDuration.match(/(\d+)D/)?.[1] || 2);
+    // Update state
+    window.galleryState.isOpen = true;
+    window.galleryState.currentPackageId = packageId;
+    window.galleryState.currentPackageName = packageName;
     
-    // Reset and rebuild itinerary
-    const container = document.getElementById('itinerary-days');
-    container.innerHTML = '';
-    dayCount = 0;
+    // Get modal elements
+    const modal = document.getElementById('galleryManageModal');
+    const packageIdInput = document.getElementById('galleryPackageId');
+    const packageNameSpan = document.getElementById('galleryPackageName');
     
-    // Add days based on selected duration
-    for (let i = 0; i < days; i++) {
-        addItineraryDay();
+    console.log('🔍 Modal elements found:', {
+        modal: !!modal,
+        packageIdInput: !!packageIdInput,
+        packageNameSpan: !!packageNameSpan
+    });
+    
+    // Update modal content
+    if (packageIdInput) {
+        packageIdInput.value = packageId;
+        console.log('✅ Package ID set to:', packageIdInput.value);
     }
     
-    updateDayCounter();
-}
-
-function addItineraryDay() {
-    dayCount++;
-    const container = document.getElementById('itinerary-days');
+    if (packageNameSpan) {
+        packageNameSpan.textContent = packageName;
+        console.log('✅ Package name set to:', packageNameSpan.textContent);
+    }
     
-    const dayDiv = document.createElement('div');
-    dayDiv.className = 'day-itinerary';
-    dayDiv.id = `day-${dayCount}`;
-    
-    dayDiv.innerHTML = `
-        <div class="day-header" onclick="toggleDayContent(${dayCount})">
-            <span>Hari ${dayCount}</span>
-        </div>
-        <div class="day-content" id="day-content-${dayCount}">
-            <div class="form-group">
-                <label for="day-title-${dayCount}">Judul Hari ${dayCount}</label>
-                <input type="text" 
-                       id="day-title-${dayCount}" 
-                       name="day_titles[]" 
-                       placeholder="Contoh: Hari 1 - Tiba di Yogyakarta"
-                       value="Hari ${dayCount}">
-            </div>
-            
-            <div class="activities-container" id="activities-${dayCount}">
-                <label>Aktivitas Hari ${dayCount}</label>
-                <div class="activity-item">
-                    <div class="form-grid-two">
-                        <input type="time" name="day_${dayCount}_times[]" placeholder="Waktu">
-                        <input type="text" name="day_${dayCount}_activities[]" placeholder="Deskripsi aktivitas">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="activity-controls">
-                <button type="button" class="btn-add-activity" onclick="addActivity(${dayCount})">
-                    <i class="fas fa-plus"></i> Tambah Aktivitas
-                </button>
-                <button type="button" class="btn-remove-day" onclick="removeDay(${dayCount})">
-                    <i class="fas fa-trash"></i> Hapus Hari
-                </button>
-            </div>
-        </div>
-    `;
-    
-    container.appendChild(dayDiv);
-    updateDayCounter();
-    
-    // Expand the newly added day
-    setTimeout(() => {
-        toggleDayContent(dayCount, true);
-    }, 100);
-}
-
-function toggleDayContent(dayNum, forceOpen = false) {
-    const header = document.querySelector(`#day-${dayNum} .day-header`);
-    const content = document.getElementById(`day-content-${dayNum}`);
-    
-    if (!header || !content) return;
-    
-    if (forceOpen || !content.classList.contains('expanded')) {
-        // Close all other days
-        document.querySelectorAll('.day-content').forEach(dayContent => {
-            if (dayContent.id !== `day-content-${dayNum}`) {
-                dayContent.classList.remove('expanded');
-                dayContent.parentElement.querySelector('.day-header').classList.remove('active');
-            }
-        });
+    // Show modal
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
         
-        // Open this day
-        header.classList.add('active');
-        content.classList.add('expanded');
+        // Force reflow
+        modal.offsetHeight;
+        
+        modal.style.transition = 'opacity 0.3s ease';
+        modal.style.opacity = '1';
+        
+        document.body.style.overflow = 'hidden';
+        console.log('✅ Modal displayed');
     } else {
-        // Close this day
-        header.classList.remove('active');
-        content.classList.remove('expanded');
-    }
-}
-
-function addActivity(dayNum) {
-    const container = document.getElementById(`activities-${dayNum}`);
-    const activityDiv = document.createElement('div');
-    activityDiv.className = 'activity-item';
-    
-    activityDiv.innerHTML = `
-        <div class="form-grid-two">
-            <input type="time" name="day_${dayNum}_times[]" placeholder="Waktu">
-            <input type="text" name="day_${dayNum}_activities[]" placeholder="Deskripsi aktivitas">
-        </div>
-        <button type="button" class="btn-remove-activity" onclick="removeActivity(this)">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    container.appendChild(activityDiv);
-}
-
-function removeActivity(button) {
-    button.parentElement.remove();
-}
-
-function removeDay(dayNum) {
-    if (dayCount <= 1) {
-        alert('Minimal harus ada 1 hari dalam itinerary');
+        console.error('❌ Modal not found!');
         return;
     }
     
-    if (confirm(`Hapus Hari ${dayNum}?`)) {
-        document.getElementById(`day-${dayNum}`).remove();
-        dayCount--;
-        updateDayCounter();
-        renumberDays();
-    }
+    // Load photos
+    loadGalleryPhotos(packageId);
 }
 
-function renumberDays() {
-    const days = document.querySelectorAll('.day-itinerary');
-    days.forEach((day, index) => {
-        const newDayNum = index + 1;
-        const oldId = day.id;
-        
-        // Update day container
-        day.id = `day-${newDayNum}`;
-        
-        // Update header
-        const header = day.querySelector('.day-header span');
-        if (header) header.textContent = `Hari ${newDayNum}`;
-        
-        // Update header onclick
-        const headerDiv = day.querySelector('.day-header');
-        if (headerDiv) headerDiv.setAttribute('onclick', `toggleDayContent(${newDayNum})`);
-        
-        // Update content id
-        const content = day.querySelector('.day-content');
-        if (content) content.id = `day-content-${newDayNum}`;
-        
-        // Update form elements
-        updateDayFormElements(day, newDayNum);
-    });
+function closeGalleryModal() {
+    console.log('❌ Closing gallery modal');
     
-    dayCount = days.length;
-}
-
-function updateDayFormElements(dayElement, dayNum) {
-    // Update day title
-    const titleInput = dayElement.querySelector('input[name="day_titles[]"]');
-    if (titleInput) {
-        titleInput.id = `day-title-${dayNum}`;
-        titleInput.placeholder = `Contoh: Hari ${dayNum} - Tiba di Yogyakarta`;
-        if (titleInput.value.startsWith('Hari ')) {
-            titleInput.value = `Hari ${dayNum}`;
-        }
+    const modal = document.getElementById('galleryManageModal');
+    if (modal) {
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            window.galleryState.isOpen = false;
+            window.galleryState.currentPackageId = null;
+            window.galleryState.currentPackageName = '';
+            document.body.style.overflow = '';
+        }, 300);
     }
     
-    // Update activities container
-    const activitiesContainer = dayElement.querySelector('.activities-container');
-    if (activitiesContainer) {
-        activitiesContainer.id = `activities-${dayNum}`;
-        
-        const label = activitiesContainer.querySelector('label');
-        if (label) label.textContent = `Aktivitas Hari ${dayNum}`;
-    }
-    
-    // Update time and activity inputs
-    const timeInputs = dayElement.querySelectorAll('input[type="time"]');
-    const activityInputs = dayElement.querySelectorAll('input[type="text"]:not([name="day_titles[]"])');
-    
-    timeInputs.forEach(input => {
-        input.name = `day_${dayNum}_times[]`;
-    });
-    
-    activityInputs.forEach(input => {
-        if (input.name.includes('_activities[]')) {
-            input.name = `day_${dayNum}_activities[]`;
-        }
-    });
-    
-    // Update button onclick
-    const addActivityBtn = dayElement.querySelector('.btn-add-activity');
-    if (addActivityBtn) {
-        addActivityBtn.setAttribute('onclick', `addActivity(${dayNum})`);
-    }
-    
-    const removeDayBtn = dayElement.querySelector('.btn-remove-day');
-    if (removeDayBtn) {
-        removeDayBtn.setAttribute('onclick', `removeDay(${dayNum})`);
-    }
-}
-
-function resetItinerary() {
-    if (confirm('Reset semua itinerary? Data yang sudah diisi akan hilang.')) {
-        const container = document.getElementById('itinerary-days');
-        container.innerHTML = '';
-        dayCount = 0;
-        
-        // Add one default day
-        addItineraryDay();
-        updateDayCounter();
-    }
-}
-
-function updateDayCounter() {
-    const counter = document.querySelector('.day-counter');
-    if (counter) {
-        counter.textContent = `${dayCount} Hari`;
-    }
-}
-
-// Form submission handler
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize with default duration
-    updateItineraryDays();
-    
-    // Handle form submission to collect itinerary data
-    const form = document.querySelector('.admin-form');
+    // Reset form
+    const form = document.getElementById('galleryUploadForm');
     if (form) {
-        form.addEventListener('submit', function(e) {
-            const itineraryData = collectItineraryData();
+        form.reset();
+        const captionsContainer = document.getElementById('galleryCaptions');
+        if (captionsContainer) captionsContainer.innerHTML = '';
+    }
+}
+
+// Load photos function
+async function loadGalleryPhotos(packageId) {
+    console.log('📸 Loading photos for package:', packageId);
+    
+    const container = document.getElementById('existingPhotos');
+    if (!container) {
+        console.error('❌ Container not found!');
+        return;
+    }
+    
+    // Show loading
+    container.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <p>Memuat foto gallery...</p>
+        </div>
+    `;
+    
+    try {
+        const timestamp = Date.now();
+        const response = await fetch(`get_gallery_photos.php?package_id=${packageId}&_t=${timestamp}`);
+        
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const text = await response.text();
+        console.log('📄 Raw response:', text);
+        
+        let photos;
+        try {
+            photos = JSON.parse(text);
+            console.log('🎯 Parsed photos:', photos);
+        } catch (e) {
+            console.error('❌ JSON parse error:', e);
+            throw new Error('Invalid JSON response');
+        }
+        
+        if (photos.error) {
+            throw new Error(photos.error);
+        }
+        
+        displayGalleryPhotos(photos, packageId);
+        
+    } catch (error) {
+        console.error('❌ Error loading photos:', error);
+        container.innerHTML = `
+            <div style="text-align: center; padding: 20px; background: #fee; border-radius: 8px; color: #c33;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <h4>Error Loading Photos</h4>
+                <p>${error.message}</p>
+                <button onclick="loadGalleryPhotos(${packageId})" style="padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">
+                    <i class="fas fa-sync-alt"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Display photos function
+function displayGalleryPhotos(photos, packageId) {
+    console.log('🎨 Displaying photos:', photos);
+    
+    const container = document.getElementById('existingPhotos');
+    if (!container) {
+        console.error('❌ Container not found!');
+        return;
+    }
+    
+    if (!Array.isArray(photos) || photos.length === 0) {
+        container.innerHTML = `
+            <div style="
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 30px;
+                color: #666;
+                background: white;
+                border-radius: 8px;
+                border: 2px dashed #dee2e6;
+            ">
+                <i class="fas fa-images" style="
+                    font-size: 2.5rem;
+                    color: #3498db;
+                    margin-bottom: 10px;
+                    display: block;
+                "></i>
+                <h4 style="margin: 10px 0; color: #2c3e50;">Belum Ada Foto Gallery</h4>
+                <p style="margin: 0; font-size: 0.9rem;">Upload foto melalui form di atas untuk menambahkan gallery.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log(`📸 Creating HTML for ${photos.length} photos`);
+    
+    const photosHTML = photos.map((photo, index) => {
+        const protocol = window.location.protocol;
+        const host = window.location.host;
+        const baseUrl = `${protocol}//${host}/MPTI_TRAVEL/BackEnd/uploads/gallery/`;
+        const photoUrl = baseUrl + photo.photo_filename;
+        
+        const caption = photo.caption || 'Tanpa caption';
+        const truncatedCaption = caption.length > 15 ? caption.substring(0, 15) + '...' : caption;
+        const escapedCaption = caption.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+        
+        console.log(`📷 Photo ${index + 1}: ${photoUrl}`);
+        
+        return `
+            <div class="photo-item" data-photo-id="${photo.id}" style="
+                background: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                transition: all 0.3s ease;
+                border: 1px solid #e9ecef;
+                position: relative;
+                min-height: 140px;
+                display: flex;
+                flex-direction: column;
+            ">
+                <div class="photo-preview" style="
+                    position: relative;
+                    width: 100%;
+                    height: 80px;
+                    overflow: hidden;
+                    background: #f8f9fa;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                ">
+                    <img src="${photoUrl}" 
+                         alt="${escapedCaption}" 
+                         loading="lazy" 
+                         style="
+                             width: 100%;
+                             height: 100%;
+                             object-fit: cover;
+                             cursor: pointer;
+                             transition: transform 0.3s ease;
+                         "
+                         onclick="previewPhoto('${photoUrl}', '${escapedCaption}')"
+                         onload="console.log('✅ Image loaded:', this.src)"
+                         onerror="console.log('❌ Image error:', this.src); this.src='../Asset/Package_Culture/borobudur.jpg'; this.style.opacity='0.7';">
+                    
+                    <div class="photo-overlay" style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0,0,0,0.7);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 4px;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    ">
+                        <button onclick="editPhotoCaption(${photo.id}, '${escapedCaption}')" 
+                                style="
+                                    background: #3498db;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 50%;
+                                    width: 24px;
+                                    height: 24px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    cursor: pointer;
+                                    font-size: 0.7rem;
+                                    transition: all 0.3s ease;
+                                "
+                                title="Edit Caption"
+                                onmouseover="this.style.background='#2980b9'; this.style.transform='scale(1.1)'"
+                                onmouseout="this.style.background='#3498db'; this.style.transform='scale(1)'">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deletePhoto(${photo.id}, ${packageId})" 
+                                style="
+                                    background: #e74c3c;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 50%;
+                                    width: 24px;
+                                    height: 24px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    cursor: pointer;
+                                    font-size: 0.7rem;
+                                    transition: all 0.3s ease;
+                                "
+                                title="Hapus Foto"
+                                onmouseover="this.style.background='#c0392b'; this.style.transform='scale(1.1)'"
+                                onmouseout="this.style.background='#e74c3c'; this.style.transform='scale(1)'">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="photo-info" style="
+                    padding: 6px;
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                ">
+                    <div class="photo-caption" id="caption-${photo.id}" style="
+                        font-weight: 600;
+                        color: #2c3e50;
+                        margin-bottom: 3px;
+                        font-size: 0.7rem;
+                        line-height: 1.2;
+                        min-height: 16px;
+                        flex: 1;
+                    " title="${escapedCaption}">
+                        ${truncatedCaption}
+                    </div>
+                    <div class="photo-meta" style="
+                        color: #6c757d;
+                        font-size: 0.55rem;
+                        margin-bottom: 4px;
+                        line-height: 1.2;
+                    ">
+                        Order: ${photo.photo_order} | ${formatDate(photo.uploaded_at)}
+                    </div>
+                    <div class="photo-actions" style="
+                        display: flex;
+                        gap: 2px;
+                        justify-content: flex-start;
+                    ">
+                        <button onclick="movePhoto(${photo.id}, ${packageId}, 'up')" 
+                                style="
+                                    background: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 3px;
+                                    padding: 2px 4px;
+                                    font-size: 0.5rem;
+                                    cursor: pointer;
+                                    transition: background 0.3s ease;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 1px;
+                                "
+                                title="Pindah ke atas"
+                                onmouseover="this.style.background='#5a6268'"
+                                onmouseout="this.style.background='#6c757d'">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button onclick="movePhoto(${photo.id}, ${packageId}, 'down')" 
+                                style="
+                                    background: #6c757d;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 3px;
+                                    padding: 2px 4px;
+                                    font-size: 0.5rem;
+                                    cursor: pointer;
+                                    transition: background 0.3s ease;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 1px;
+                                "
+                                title="Pindah ke bawah"
+                                onmouseover="this.style.background='#5a6268'"
+                                onmouseout="this.style.background='#6c757d'">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = photosHTML;
+    console.log('✅ Photos HTML set, length:', photosHTML.length);
+    
+    // Force browser reflow
+    container.offsetHeight;
+    
+    // Add hover effects programmatically
+    setTimeout(() => {
+        const photoItems = container.querySelectorAll('.photo-item');
+        console.log('🎯 Adding hover effects to', photoItems.length, 'items');
+        
+        photoItems.forEach((item, index) => {
+            console.log(`📱 Setting up hover for item ${index + 1}`);
             
-            // Add itinerary data to form
-            const itineraryInput = document.createElement('input');
-            itineraryInput.type = 'hidden';
-            itineraryInput.name = 'itinerary';
-            itineraryInput.value = JSON.stringify(itineraryData);
+            item.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+                this.style.transform = 'translateY(-2px)';
+                this.style.borderColor = '#3498db';
+                
+                const overlay = this.querySelector('.photo-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '1';
+                }
+            });
             
-            form.appendChild(itineraryInput);
+            item.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                this.style.transform = 'translateY(0)';
+                this.style.borderColor = '#e9ecef';
+                
+                const overlay = this.querySelector('.photo-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                }
+            });
         });
+    }, 100);
+    
+    // Verify elements are actually in DOM
+    setTimeout(() => {
+        const finalCheck = container.querySelectorAll('.photo-item');
+        console.log('🔍 Final check - photo items in DOM:', finalCheck.length);
+        
+        if (finalCheck.length === 0) {
+            console.error('❌ No photo items found after insertion!');
+            console.log('Container HTML:', container.innerHTML);
+        } else {
+            console.log('✅ Photos successfully displayed and verified!');
+        }
+    }, 200);
+}
+
+// Helper functions
+function formatDate(dateString) {
+    if (!dateString) return 'Tidak diketahui';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return 'Format tanggal tidak valid';
+    }
+}
+
+function previewPhoto(imageUrl, caption) {
+    const lightbox = document.createElement('div');
+    lightbox.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); z-index: 10001; display: flex;
+        align-items: center; justify-content: center; flex-direction: column;
+        padding: 20px; cursor: pointer;
+    `;
+    
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.style.cssText = `
+        max-width: 90%; max-height: 80%; object-fit: contain;
+        border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    `;
+    
+    const captionEl = document.createElement('div');
+    captionEl.textContent = caption || 'Tanpa caption';
+    captionEl.style.cssText = `
+        color: white; text-align: center; margin-top: 15px;
+        font-size: 1.1rem; max-width: 600px;
+    `;
+    
+    const closeHint = document.createElement('div');
+    closeHint.textContent = 'Klik untuk menutup';
+    closeHint.style.cssText = `
+        color: rgba(255,255,255,0.7); text-align: center;
+        margin-top: 10px; font-size: 0.9rem;
+    `;
+    
+    lightbox.appendChild(img);
+    lightbox.appendChild(captionEl);
+    lightbox.appendChild(closeHint);
+    
+    lightbox.onclick = () => {
+        lightbox.remove();
+        document.body.style.overflow = '';
+    };
+    
+    document.body.appendChild(lightbox);
+    document.body.style.overflow = 'hidden';
+}
+
+function editPhotoCaption(photoId, currentCaption) {
+    const newCaption = prompt('Edit caption foto:', currentCaption);
+    if (newCaption === null) return; // User cancelled
+    
+    // Update caption via AJAX
+    fetch('update_photo_caption.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            photo_id: photoId,
+            caption: newCaption
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showNotification('Caption berhasil diupdate!', 'success');
+            loadGalleryPhotos(window.galleryState.currentPackageId);
+        } else {
+            throw new Error(result.message || 'Gagal update caption');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating caption:', error);
+        showNotification('Error: ' + error.message, 'error');
+    });
+}
+
+function deletePhoto(photoId, packageId) {
+    if (!confirm('Apakah Anda yakin ingin menghapus foto ini?')) return;
+    
+    fetch('delete_gallery_photo.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `photo_id=${photoId}&package_id=${packageId}`
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showNotification('Foto berhasil dihapus!', 'success');
+            loadGalleryPhotos(packageId);
+        } else {
+            throw new Error(result.message || 'Gagal menghapus foto');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting photo:', error);
+        showNotification('Error: ' + error.message, 'error');
+    });
+}
+
+function movePhoto(photoId, packageId, direction) {
+    fetch('move_photo_order.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `photo_id=${photoId}&package_id=${packageId}&direction=${direction}`
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showNotification(`Foto berhasil dipindah ${direction === 'up' ? 'ke atas' : 'ke bawah'}!`, 'success');
+            loadGalleryPhotos(packageId);
+        } else {
+            throw new Error(result.message || 'Gagal memindah foto');
+        }
+    })
+    .catch(error => {
+        console.error('Error moving photo:', error);
+        showNotification('Error: ' + error.message, 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+        border-radius: 8px; color: white; font-weight: 600; z-index: 10000;
+        opacity: 0; transform: translateX(100%); transition: all 0.3s ease;
+        max-width: 300px; word-wrap: break-word; font-size: 0.9rem;
+        background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+    `;
+    
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// File selection handler
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM loaded, setting up events...');
+    
+    // File selection for captions
+    const galleryFiles = document.getElementById('galleryFiles');
+    if (galleryFiles) {
+        galleryFiles.addEventListener('change', function() {
+            const files = this.files;
+            const captionsContainer = document.getElementById('galleryCaptions');
+            if (!captionsContainer) return;
+            
+            captionsContainer.innerHTML = '';
+            
+            if (files.length > 0) {
+                const captionsHTML = Array.from(files).map((file, index) => `
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.9rem; margin-bottom: 5px; display: block;">Caption untuk "${file.name}":</label>
+                        <input type="text" name="captions[]" 
+                               placeholder="Masukkan caption foto..." 
+                               style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                    </div>
+                `).join('');
+                
+                captionsContainer.innerHTML = captionsHTML;
+            }
+        });
+    }
+    
+    // Gallery upload form
+    const galleryUploadForm = document.getElementById('galleryUploadForm');
+    if (galleryUploadForm) {
+        galleryUploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const packageId = document.getElementById('galleryPackageId').value;
+            const files = document.getElementById('galleryFiles').files;
+            
+            if (!packageId || files.length === 0) {
+                alert('Package ID dan foto diperlukan');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            
+            try {
+                const response = await fetch('upload_additional_photos.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Foto berhasil diupload!', 'success');
+                    loadGalleryPhotos(packageId);
+                    this.reset();
+                    document.getElementById('galleryCaptions').innerHTML = '';
+                } else {
+                    throw new Error(result.error || 'Upload gagal');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showNotification('Error: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Foto';
+            }
+        });
+    }
+    
+    // Modal close events
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('close')) {
+            closeGalleryModal();
+        }
+        if (e.target && e.target.id === 'galleryManageModal') {
+            closeGalleryModal();
+        }
+    });
+    
+    // Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && window.galleryState.isOpen) {
+            closeGalleryModal();
+        }
+    });
+    
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // Prevent pull-to-refresh
+    document.body.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1) return;
+        
+        const scrollY = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
+        if (scrollY === 0) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Smooth scrolling for iOS
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        document.body.style.webkitOverflowScrolling = 'touch';
+    }
+    
+    // Force hardware acceleration on mobile
+    if (window.innerWidth <= 768) {
+        const style = document.createElement('style');
+        style.textContent = `
+            * {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+        `;
+        document.head.appendChild(style);
     }
 });
 
-function collectItineraryData() {
-    const itineraryData = {};
+// Debug function
+window.debugGallery = function() {
+    console.log('🔍 === GALLERY DEBUG ===');
+    console.log('Gallery State:', window.galleryState);
     
-    document.querySelectorAll('.day-itinerary').forEach((dayElement, index) => {
-        const dayNum = index + 1;
-        const dayId = `day_${dayNum}`;
-        
-        const titleInput = dayElement.querySelector('input[name="day_titles[]"]');
-        const timeInputs = dayElement.querySelectorAll(`input[name="day_${dayNum}_times[]"]`);
-        const activityInputs = dayElement.querySelectorAll(`input[name="day_${dayNum}_activities[]"]`);
-        
-        const activities = [];
-        for (let i = 0; i < Math.max(timeInputs.length, activityInputs.length); i++) {
-            const time = timeInputs[i]?.value || '';
-            const description = activityInputs[i]?.value || '';
-            
-            if (description.trim()) {
-                activities.push({
-                    time: time,
-                    description: description.trim()
-                });
-            }
+    const modal = document.getElementById('galleryManageModal');
+    console.log('Modal:', modal ? 'Found' : 'NOT FOUND');
+    console.log('Modal display:', modal ? modal.style.display : 'N/A');
+    
+    const container = document.getElementById('existingPhotos');
+    console.log('Container:', container ? 'Found' : 'NOT FOUND');
+    console.log('Container content length:', container ? container.innerHTML.length : 'N/A');
+    
+    console.log('Window functions:', {
+        openGalleryManage: typeof window.openGalleryManage,
+        closeGalleryModal: typeof window.closeGalleryModal,
+        loadGalleryPhotos: typeof window.loadGalleryPhotos
+    });
+};
+
+// Make functions global
+window.openGalleryManage = openGalleryManage;
+window.closeGalleryModal = closeGalleryModal;
+window.loadGalleryPhotos = loadGalleryPhotos;
+
+console.log('✅ Gallery system initialized');
+
+// Responsive behavior handler
+function handleResponsiveChanges() {
+    const isMobile = window.innerWidth <= 768;
+    const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+    
+    // Adjust modal for mobile
+    const modal = document.getElementById('galleryManageModal');
+    if (modal && isMobile) {
+        modal.style.padding = '10px 5px';
+    }
+    
+    // Adjust grid columns based on screen size
+    const photoGrid = document.getElementById('existingPhotos');
+    if (photoGrid) {
+        if (window.innerWidth <= 480) {
+            photoGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
+            photoGrid.style.gap = '5px';
+        } else if (window.innerWidth <= 768) {
+            photoGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(110px, 1fr))';
+            photoGrid.style.gap = '8px';
+        } else {
+            photoGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(140px, 1fr))';
+            photoGrid.style.gap = '10px';
         }
-        
-        if (activities.length > 0) {
-            itineraryData[dayId] = {
-                title: titleInput?.value || `Hari ${dayNum}`,
-                activities: activities
-            };
+    }
+    
+    // Adjust form actions for mobile
+    const formActions = document.querySelectorAll('.form-actions');
+    formActions.forEach(action => {
+        if (isMobile) {
+            action.style.flexDirection = 'column';
+            action.style.gap = '10px';
+        } else {
+            action.style.flexDirection = 'row';
+            action.style.gap = '15px';
         }
     });
     
-    return itineraryData;
+    // Adjust package grid for mobile
+    const packageGrid = document.querySelector('.packages-grid');
+    if (packageGrid) {
+        if (isMobile) {
+            packageGrid.style.gridTemplateColumns = '1fr';
+        } else if (isTablet) {
+            packageGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+        } else {
+            packageGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(380px, 1fr))';
+        }
+    }
 }
 
-// Preview function
-function previewPackage() {
-    const formData = new FormData(document.querySelector('.admin-form'));
-    const itineraryData = collectItineraryData();
+// Header scroll behavior for mobile
+function handleHeaderScroll() {
+    const header = document.querySelector('.admin-header');
+    if (!header) return;
     
-    // Create preview window
-    const previewWindow = window.open('', 'preview', 'width=800,height=600,scrollbars=yes');
-    
-    previewWindow.document.write(`
-        <html>
-        <head>
-            <title>Preview Paket</title>
-            <style>
-                body { font-family: Arial, sans-serif; padding: 20px; }
-                .preview-section { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
-                .preview-title { color: #2c3e50; font-size: 1.5em; margin-bottom: 10px; }
-                .day-preview { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; }
-            </style>
-        </head>
-        <body>
-            <h1>Preview: ${formData.get('nama') || 'Paket Wisata'}</h1>
-            
-            <div class="preview-section">
-                <div class="preview-title">Deskripsi</div>
-                <p>${formData.get('deskripsi') || 'Tidak ada deskripsi'}</p>
-            </div>
-            
-            <div class="preview-section">
-                <div class="preview-title">Detail Paket</div>
-                <p><strong>Durasi:</strong> ${formData.get('duration') || '2D1N'}</p>
-                <p><strong>Harga:</strong> Rp ${parseInt(formData.get('price') || 0).toLocaleString('id-ID')}</p>
-            </div>
-            
-            <div class="preview-section">
-                <div class="preview-title">Itinerary</div>
-                ${Object.entries(itineraryData).map(([dayId, dayData]) => `
-                    <div class="day-preview">
-                        <h3>${dayData.title}</h3>
-                        <ul>
-                            ${dayData.activities.map(activity => `
-                                <li>${activity.time ? activity.time + ' - ' : ''}${activity.description}</li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                `).join('')}
-            </div>
-            
-            <button onclick="window.close()">Tutup Preview</button>
-        </body>
-        </html>
-    `);
+    if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
 }
+
+// Touch gesture support for mobile gallery
+function addTouchSupport() {
+    const photoItems = document.querySelectorAll('.photo-management-item');
+    
+    photoItems.forEach(item => {
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        item.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+        
+        item.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            
+            // Swipe up to show overlay
+            if (touchStartY - touchEndY > 50) {
+                const overlay = this.querySelector('.photo-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '1';
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                    }, 3000);
+                }
+            }
+        }, { passive: true });
+    });
+}
+
+// Virtual keyboard handling for mobile
+function handleVirtualKeyboard() {
+    const viewport = window.visualViewport;
+    
+    if (viewport) {
+        viewport.addEventListener('resize', () => {
+            const modal = document.getElementById('galleryManageModal');
+            if (modal && modal.style.display === 'flex') {
+                const keyboardHeight = window.innerHeight - viewport.height;
+                
+                if (keyboardHeight > 150) {
+                    // Virtual keyboard is open
+                    modal.style.alignItems = 'flex-start';
+                    modal.style.paddingTop = '20px';
+                } else {
+                    // Virtual keyboard is closed
+                    modal.style.alignItems = 'center';
+                    modal.style.paddingTop = '0';
+                }
+            }
+        });
+    }
+}
+
+// Orientation change handler
+function handleOrientationChange() {
+    setTimeout(() => {
+        handleResponsiveChanges();
+        
+        // Force modal reposition on orientation change
+        const modal = document.getElementById('galleryManageModal');
+        if (modal && modal.style.display === 'flex') {
+            modal.style.height = '100vh';
+            modal.style.height = '100dvh'; // Use dynamic viewport height if supported
+        }
+    }, 100);
+}
+
+// Initialize responsive handlers
+function initResponsive() {
+    handleResponsiveChanges();
+    
+    // Add event listeners
+    window.addEventListener('resize', handleResponsiveChanges);
+    window.addEventListener('scroll', handleHeaderScroll);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    // Add touch support
+    setTimeout(addTouchSupport, 1000);
+    
+    // Handle virtual keyboard
+    handleVirtualKeyboard();
+    
+    // Initial header state
+    handleHeaderScroll();
+}
+
+// Update the existing DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM loaded, setting up events...');
+    
+    // Initialize responsive behavior
+    initResponsive();
+    
+    // File selection for captions
+    const galleryFiles = document.getElementById('galleryFiles');
+    if (galleryFiles) {
+        galleryFiles.addEventListener('change', function() {
+            const files = this.files;
+            const captionsContainer = document.getElementById('galleryCaptions');
+            if (!captionsContainer) return;
+            
+            captionsContainer.innerHTML = '';
+            
+            if (files.length > 0) {
+                const captionsHTML = Array.from(files).map((file, index) => `
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.9rem; margin-bottom: 5px; display: block;">Caption untuk "${file.name}":</label>
+                        <input type="text" name="captions[]" 
+                               placeholder="Masukkan caption foto..." 
+                               style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                    </div>
+                `).join('');
+                
+                captionsContainer.innerHTML = captionsHTML;
+            }
+        });
+    }
+    
+    // Gallery upload form
+    const galleryUploadForm = document.getElementById('galleryUploadForm');
+    if (galleryUploadForm) {
+        galleryUploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const packageId = document.getElementById('galleryPackageId').value;
+            const files = document.getElementById('galleryFiles').files;
+            
+            if (!packageId || files.length === 0) {
+                alert('Package ID dan foto diperlukan');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            
+            try {
+                const response = await fetch('upload_additional_photos.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Foto berhasil diupload!', 'success');
+                    loadGalleryPhotos(packageId);
+                    this.reset();
+                    document.getElementById('galleryCaptions').innerHTML = '';
+                } else {
+                    throw new Error(result.error || 'Upload gagal');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showNotification('Error: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Foto';
+            }
+        });
+    }
+    
+    // Modal close events
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('close')) {
+            closeGalleryModal();
+        }
+        if (e.target && e.target.id === 'galleryManageModal') {
+            closeGalleryModal();
+        }
+    });
+    
+    // Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && window.galleryState.isOpen) {
+            closeGalleryModal();
+        }
+    });
+    
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // Prevent pull-to-refresh
+    document.body.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1) return;
+        
+        const scrollY = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
+        if (scrollY === 0) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Smooth scrolling for iOS
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        document.body.style.webkitOverflowScrolling = 'touch';
+    }
+    
+    // Force hardware acceleration on mobile
+    if (window.innerWidth <= 768) {
+        const style = document.createElement('style');
+        style.textContent = `
+            * {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+});
+
+// Update displayGalleryPhotos function to include responsive support
+const originalDisplayGalleryPhotos = displayGalleryPhotos;
+displayGalleryPhotos = function(photos, packageId) {
+    const result = originalDisplayGalleryPhotos(photos, packageId);
+    
+    // Add responsive behavior and touch support after photos are displayed
+    setTimeout(() => {
+        handleResponsiveChanges();
+        addTouchSupport();
+    }, 200);
+    
+    return result;
+};
+
+console.log('🔧 Responsive enhancements loaded');
 </script>
+
+<!-- Tambahkan tombol debug di bawah header -->
+<div style="position: fixed; top: 100px; right: 20px; z-index: 999;">
+    <button onclick="window.debugGallery()" style="background: #e74c3c; color: white; padding: 8px 12px; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+        🔍 Debug Gallery
+    </button>
+</div>
 </body>
 </html>
